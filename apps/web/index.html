@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KissanAI — Dhenu Agricultural AI Operating System</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <!-- Babel for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Bengali:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .font-indic { font-family: 'Noto Sans Bengali', 'Noto Sans Devanagari', 'Plus Jakarta Sans', sans-serif; }
+    .bg-grid-pattern {
+      background-image: radial-gradient(rgba(16, 185, 129, 0.08) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.15); opacity: 0.3; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .pulse-ring { animation: pulse-ring 2.5s infinite ease-in-out; }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(51, 65, 85, 0.6);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen bg-grid-pattern antialiased selection:bg-emerald-500 selection:text-white">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // Supported Indic Languages
+    const LANGUAGES = [
+      { code: 'bn', name: 'বাংলা', label: 'Bengali' },
+      { code: 'hi', name: 'हिन्दी', label: 'Hindi' },
+      { code: 'mr', name: 'मराठी', label: 'Marathi' },
+      { code: 'en', name: 'English', label: 'English' },
+      { code: 'pa', name: 'ਪੰਜਾਬੀ', label: 'Punjabi' },
+      { code: 'gu', name: 'ગુજરાતી', label: 'Gujarati' },
+      { code: 'te', name: 'తెలుగు', label: 'Telugu' },
+      { code: 'ta', name: 'தமிழ்', label: 'Tamil' }
+    ];
+
+    // Sample Voice Questions in Regional Languages
+    const VOICE_PROMPTS = {
+      bn: [
+        "ধানের পাতায় বাদামী দাগ ও ধসা রোগ দেখা দিয়েছে, কী স্প্রে করব?",
+        "আজকে বর্ধমান বাজারে আমন ধানের সরকারি দর কত?",
+        "আলু চাষে নাবি ধসা (Late Blight) দমনে সেরা কীটনাশক কোনটি?",
+        "পিএম কিষাণ যোজনার পরবর্তী কিস্তির টাকা কবে আসবে?"
+      ],
+      hi: [
+        "कपास में गुलाबी सुंडी (Pink Bollworm) के नियंत्रण के लिए क्या करें?",
+        "आज लासलगांव मंडी में प्याज का भाव क्या है?",
+        "गेहूं की फसल में पीला रतुआ (Yellow Rust) के लक्षण और उपचार बताएं?",
+        "पीएम फसल बीमा योजना (PMFBY) में क्लेम कैसे दर्ज करें?"
+      ],
+      mr: [
+        "सोयाबीन पिकावर खोडकिडीचा प्रादुर्भाव झाला आहे, कोणती फवारणी करावी?",
+        "कांदा पिकासाठी खताचे योग्य नियोजन सांगा?",
+        "द्राक्ष बागेत डाउनी मिल्ड्यूच्या नियंत्रणासाठी सुरक्षित बुरशीनाशक कोणते?",
+        "महाडीबीटी शेतकरी योजनेतून ट्रॅक्टर अनुदान कसे मिळवावे?"
+      ],
+      en: [
+        "What is the recommended chlorpyrifos dosage for paddy stem borer?",
+        "Check today's modal mandi price for wheat and mustard in Punjab.",
+        "How to treat early blight in tomatoes organically?",
+        "Best spray window based on tomorrow's wind and humidity?"
+      ]
+    };
+
+    // Plant Doctor Diagnostics Database
+    const PLANT_DISEASES = [
+      {
+        id: "blast-paddy",
+        crop: "Paddy (ধান / धान)",
+        disease: "Paddy Blast & Brown Leaf Spot",
+        pathogen: "Magnaporthe oryzae / Bipolaris oryzae",
+        confidence: "98.2%",
+        severity: "HIGH",
+        triangle: "Yellow",
+        triangleBg: "bg-amber-500 text-slate-950",
+        symptoms: "Spindle-shaped lesions with brown margins and grey centers on leaf blades and neck.",
+        organicSolution: "Spray Pseudomonas fluorescens @ 10g/L or Neem oil (1500 ppm) @ 3 ml/L of clean water.",
+        chemicalSolution: "Tricyclazole 75% WP @ 0.6g per Litre OR Azoxystrobin 18.2% + Difenoconazole 11.4% SC @ 1.0 ml/L.",
+        dosage: "120g per 200 Litres of water per acre",
+        phi: "21 Days Waiting Period",
+        caution: "Do NOT spray in direct strong sunlight or during bloom to protect pollinator honeybees."
+      },
+      {
+        id: "bollworm-cotton",
+        crop: "Cotton (कपास / তুলো)",
+        disease: "Pink Bollworm Infestation",
+        pathogen: "Pectinophora gossypiella",
+        confidence: "96.7%",
+        severity: "CRITICAL",
+        triangle: "Red",
+        triangleBg: "bg-red-500 text-white",
+        symptoms: "Rosetted flowers, bored bolls with stained cotton lint and premature boll shedding.",
+        organicSolution: "Install 8 Pheromone traps per acre with Gossyplure septa; release Trichogramma egg parasitoids.",
+        chemicalSolution: "Emamectin Benzoate 5% SG @ 0.5g/L OR Chlorantraniliprole 18.5% SC @ 0.3 ml/L.",
+        dosage: "100g per 200 Litres of water per acre",
+        phi: "14 Days Waiting Period",
+        caution: "Wear nitrile gloves and N95 face respirator during knapsack sprayer preparation."
+      },
+      {
+        id: "blight-tomato",
+        crop: "Tomato (টমেটো / टमाटर)",
+        disease: "Early & Late Blight",
+        pathogen: "Alternaria solani / Phytophthora infestans",
+        confidence: "94.5%",
+        severity: "MEDIUM",
+        triangle: "Green",
+        triangleBg: "bg-emerald-500 text-white",
+        symptoms: "Concentric 'target-board' dark brown rings on lower leaves followed by stem cankers.",
+        organicSolution: "Spray Trichoderma harzianum @ 5g/L; ensure proper crop canopy spacing for air flow.",
+        chemicalSolution: "Mancozeb 75% WP @ 2.0g to 2.5g per Litre of water.",
+        dosage: "500g in 200 Litres of water per acre",
+        phi: "7 Days Waiting Period",
+        caution: "Do not contaminate irrigation canals or fish ponds."
+      }
+    ];
+
+    // Mandi APMC Live Market Prices
+    const MANDI_DATA = [
+      { crop: "Aman Paddy (ধান)", market: "Burdwan APMC (WB)", price: 2350, change: "+₹75", unit: "₹/Quintal", status: "up" },
+      { crop: "Wheat (गेहूं)", market: "Khanna APMC (Punjab)", price: 2420, change: "+₹40", unit: "₹/Quintal", status: "up" },
+      { crop: "Onion (कांदा)", market: "Lasalgaon APMC (MH)", price: 2180, change: "-₹60", unit: "₹/Quintal", status: "down" },
+      { crop: "Cotton (कपास)", market: "Rajkot APMC (Gujarat)", price: 7450, change: "+₹180", unit: "₹/Quintal", status: "up" },
+      { crop: "Soybean (सोयाबीन)", market: "Indore APMC (MP)", price: 4620, change: "+₹30", unit: "₹/Quintal", status: "up" },
+      { crop: "Mustard (सरसों)", market: "Alwar APMC (Rajasthan)", price: 5650, change: "+₹90", unit: "₹/Quintal", status: "up" },
+      { crop: "Chilli (লঙ্কা)", market: "Guntur APMC (AP)", price: 18400, change: "-₹250", unit: "₹/Quintal", status: "down" },
+      { crop: "Potato (আলু)", market: "Hooghly APMC (WB)", price: 1320, change: "+₹20", unit: "₹/Quintal", status: "up" }
+    ];
+
+    function App() {
+      const [lang, setLang] = useState('bn');
+      const [activeTab, setActiveTab] = useState('advisor');
+      const [isListening, setIsListening] = useState(false);
+      const [voiceText, setVoiceText] = useState('');
+      const [chatMessages, setChatMessages] = useState([
+        {
+          sender: 'ai',
+          text: 'নমস্কার! আমি কিষাণ এআই (ধেনু এগ্রো ইন্টেলিজেন্স)। আপনার ফসলের রোগ নির্ণয়, সার ও কীটনাশক প্রয়োগের মাত্রা, মান্ডি দর বা আবহাওয়া সম্পর্কিত যে কোনো প্রশ্ন বলুন বা টাইপ করুন।',
+          audioLang: 'bn',
+          timestamp: 'এখন'
+        }
+      ]);
+      const [selectedDisease, setSelectedDisease] = useState(PLANT_DISEASES[0]);
+      const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+      // Dosage Calculator State
+      const [calcCrop, setCalcCrop] = useState('paddy');
+      const [calcArea, setCalcArea] = useState(2); // Acres
+      const [calcTank, setCalcTank] = useState(16); // Litres
+
+      // Simulate Voice Input
+      const toggleVoice = () => {
+        if (!isListening) {
+          setIsListening(true);
+          const prompts = VOICE_PROMPTS[lang] || VOICE_PROMPTS['en'];
+          const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
+
+          setTimeout(() => {
+            setVoiceText(randomPrompt);
+            setIsListening(false);
+            handleSendQuery(randomPrompt);
+          }, 2200);
+        } else {
+          setIsListening(false);
+        }
+      };
+
+      const handleSendQuery = (textToSend) => {
+        const query = textToSend || voiceText;
+        if (!query.trim()) return;
+
+        const userMsg = { sender: 'user', text: query, timestamp: 'এখন' };
+        setChatMessages(prev => [...prev, userMsg]);
+        setVoiceText('');
+
+        // Generate Domain AI Response
+        setTimeout(() => {
+          let aiReply = "";
+          if (query.includes('ধান') || query.includes('paddy') || query.includes('leaf spot') || query.includes('দাগ')) {
+            aiReply = `🌾 **ধানের ব্লাইট ও বাদামী পাতার দাগ সমাধান (CIBRC অনুমোদিত):**
+1. **তাত্ক্ষণিক প্রতিকার:** ট্রাইসাইক্লাজোল ৭৫% ডব্লিউপি (Tricyclazole 75% WP) প্রতি লিটার জলে ০.৬ গ্রাম অথবা অ্যাজোক্সিস্ট্রোবিন ১৮.২% + ডাইফেনোকোনাজল ১১.৪% এসসি প্রতি লিটার জলে ১.০ মিলি গুলে স্প্রে করুন।
+2. **স্প্রে করার সময়:** আগামীকাল সকাল ৬:৩০ থেকে ৯:০০ এর মধ্যে যখন বাতাসের গতিবেগ < ৮ কিমি/ঘন্টা।
+3. **প্রতীক্ষা সময় (PHI):** ফসল কাটার অন্তত ২১ দিন আগে স্প্রে বন্ধ করুন।
+4. **সতর্কতা:** স্প্রে করার সময় মুখে N95 মাস্ক ও নাইট্রাইল গ্লাভস ব্যবহার আবশ্যক।`;
+          } else if (query.includes('দর') || query.includes('দাম') || query.includes('mandi') || query.includes('भाव')) {
+            aiReply = `📊 **আজকের লাইভ মান্ডি বাজার দর আপডেট:**
+- **আমন ধান (বর্ধমান মান্ডি):** ₹২,৩৫০ / কুইন্টাল (আজ +₹৭৫ বৃদ্ধি)
+- **আলু (হুগলি মান্ডি):** ₹১,৩২০ / কুইন্টাল
+- **সরিষা (নদিয়া মান্ডি):** ₹৫,৪০০ / কুইন্টাল
+💡 *পরামর্শ: আগামী ৩ দিনে ধানের চাহিদা বেশি থাকার সম্ভাবনা রয়েছে।*`;
+          } else {
+            aiReply = `🌱 **ধেনু এগ্রো অ্যাডভাইজরি পরামর্শ:**
+আপনার প্রশ্নের প্রেক্ষিতে মাটির আর্দ্রতা পরীক্ষা করে প্রতি একরে ২০০ লিটার জলে অনুমোদিত ছত্রাকনাশক স্প্রে করুন। বৃষ্টির সম্ভাবনা ১০% এর কম থাকায় স্প্রে করার উপযুক্ত সময় চলছে। কোনো অসুবিধা হলে টোল-ফ্রি কিষাণ কল সেন্টারে ১৮০০-১৮০-১৫৫১ নম্বরে যোগাযোগ করতে পারেন।`;
+          }
+
+          setChatMessages(prev => [...prev, {
+            sender: 'ai',
+            text: aiReply,
+            audioLang: lang,
+            timestamp: 'এইমাত্র'
+          }]);
+        }, 900);
+      };
+
+      return (
+        <div className="min-h-screen flex flex-col font-indic">
+          {/* Top Banner / Ticker */}
+          <div className="bg-emerald-950/80 border-b border-emerald-800/40 px-4 py-1.5 text-xs text-emerald-300 flex items-center justify-between overflow-x-auto whitespace-nowrap">
+            <div className="flex items-center gap-4">
+              <span className="flex items-center gap-1.5 font-semibold text-emerald-400">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                Dhenu Agro AI 2.0 Live
+              </span>
+              <span>•</span>
+              <span>🌤️ বর্ধমান: ২৬°C, আর্দ্রতা ৬২%, বাতাসের গতি ৭ কিমি/ঘন্টা (স্প্রে করার সেরা সময়)</span>
+              <span>•</span>
+              <span>🌾 আমন ধান গড় মান্ডি দর: ₹২,৩৫০/কুইন্টাল (+৩.২%)</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="bg-emerald-900/60 text-emerald-200 px-2 py-0.5 rounded text-[11px] font-mono border border-emerald-700/50">
+                CIBRC Safety Compliant
+              </span>
+            </div>
+          </div>
+
+          {/* Navigation Bar */}
+          <header className="glass-card sticky top-0 z-50 border-b border-slate-800 px-4 lg:px-8 py-3.5">
+            <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20 text-2xl">
+                  🌾
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-extrabold text-lg text-white tracking-tight">Kissan<span className="text-emerald-400">AI</span></span>
+                    <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                      Dhenu OS
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-400 -mt-0.5">Agricultural AI Operating System for Indian Farmers</p>
+                </div>
+              </div>
+
+              {/* Navigation Tabs */}
+              <nav className="hidden md:flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800 text-xs font-semibold">
+                {[
+                  { id: 'advisor', label: 'ধেনু ভয়েস পরামর্শদাতা', icon: '🎙️' },
+                  { id: 'doctor', label: 'প্ল্যান্ট ডক্টর (রোগ নির্ণয়)', icon: '🔬' },
+                  { id: 'mandi', label: 'লাইভ মান্ডি দর', icon: '📈' },
+                  { id: 'calculator', label: 'কীটনাশক ডোজ ক্যালকুলেটর', icon: '🧪' },
+                  { id: 'schemes', label: 'সরকারি যোজনা ও অনুদান', icon: '🏛️' }
+                ].map(item => (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveTab(item.id)}
+                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg transition-all ${
+                      activeTab === item.id
+                        ? 'bg-emerald-600 text-white shadow-md shadow-emerald-900/40'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    }`}
+                  >
+                    <span>{item.icon}</span>
+                    <span>{item.label}</span>
+                  </button>
+                ))}
+              </nav>
+
+              {/* Language Selector */}
+              <div className="flex items-center gap-2">
+                <div className="flex items-center bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5">
+                  <span className="text-sm mr-1.5">🌐</span>
+                  <select
+                    value={lang}
+                    onChange={e => setLang(e.target.value)}
+                    className="bg-transparent text-xs font-semibold text-slate-200 focus:outline-none cursor-pointer"
+                  >
+                    {LANGUAGES.map(l => (
+                      <option key={l.code} value={l.code} className="bg-slate-900 text-slate-200">
+                        {l.name} ({l.label})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          {/* Main Dashboard Container */}
+          <main className="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-8 space-y-8">
+
+            {/* TAB 1: DHENU VOICE ASSISTANT (HERO) */}
+            {activeTab === 'advisor' && (
+              <div className="space-y-6">
+                {/* Hero Card */}
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-950/60 via-slate-900 to-slate-900 border border-emerald-900/40 p-6 md:p-8 shadow-2xl">
+                  <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+                    <div className="space-y-3 text-center lg:text-left max-w-2xl">
+                      <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs px-3 py-1 rounded-full font-medium">
+                        <span>🇮🇳</span>
+                        <span>ভারতের প্রথম বহুভাষিক কৃষি ফাউন্ডেশন মডেল</span>
+                      </div>
+                      <h1 className="text-2xl md:text-4xl font-extrabold text-white leading-tight">
+                        আপনার ভাষায় কৃষিকাজের নির্ভুল সমাধান পান
+                      </h1>
+                      <p className="text-sm text-slate-300 leading-relaxed">
+                        রোগবালাই, কীটনাশকের মাত্রা, সেচ, সার ও আবহাওয়া সম্পর্কিত যেকোনো প্রশ্ন বলুন। ধেনু এআই স্থানীয় আঞ্চলিক ভাষায় তাৎক্ষণিক অডিও ও টেক্সট পরামর্শ প্রদান করে।
+                      </p>
+                    </div>
+
+                    {/* Microphone Trigger Button */}
+                    <div className="flex flex-col items-center justify-center gap-3">
+                      <div className="relative flex items-center justify-center">
+                        {isListening && (
+                          <div className="absolute w-28 h-28 rounded-full bg-emerald-500/20 pulse-ring"></div>
+                        )}
+                        <button
+                          onClick={toggleVoice}
+                          className={`w-20 h-20 rounded-full flex items-center justify-center text-3xl shadow-xl transition-all duration-300 ${
+                            isListening
+                              ? 'bg-red-500 text-white scale-110 shadow-red-500/30 ring-4 ring-red-400/30'
+                              : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 hover:scale-105 shadow-emerald-500/30'
+                          }`}
+                        >
+                          {isListening ? '🛑' : '🎙️'}
+                        </button>
+                      </div>
+                      <span className="text-xs font-semibold text-slate-300">
+                        {isListening ? 'শুনছি... কথা বলুন' : 'কথা বলতে মাইকে চাপুন'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Sample Voice Prompts Chips */}
+                  <div className="mt-8 pt-6 border-t border-slate-800/80">
+                    <p className="text-xs font-medium text-slate-400 mb-2.5">💡 সচরাচর জিজ্ঞাসিত প্রশ্ন (ক্লিক করে শুনুন):</p>
+                    <div className="flex flex-wrap gap-2">
+                      {(VOICE_PROMPTS[lang] || VOICE_PROMPTS['bn']).map((prompt, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => handleSendQuery(prompt)}
+                          className="bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 hover:text-white border border-slate-700/60 rounded-xl px-3.5 py-1.5 text-xs transition flex items-center gap-2"
+                        >
+                          <span className="text-emerald-400">💬</span>
+                          <span>{prompt}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Live Chat Conversation Feed */}
+                <div className="bg-slate-900/80 rounded-2xl border border-slate-800 p-5 space-y-4">
+                  <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">🌾</span>
+                      <h3 className="font-bold text-sm text-white">ধেনু এআই লাইভ কৃষি পরামর্শ চ্যাট</h3>
+                    </div>
+                    <span className="text-xs text-slate-400">২৪x৭ বিনামূল্যে কৃষক সহায়তা</span>
+                  </div>
+
+                  <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
+                    {chatMessages.map((msg, i) => (
+                      <div key={i} className={`flex gap-3 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        {msg.sender === 'ai' && (
+                          <div className="w-8 h-8 rounded-lg bg-emerald-600/30 border border-emerald-500/40 flex items-center justify-center text-sm flex-shrink-0">
+                            🌾
+                          </div>
+                        )}
+                        <div className={`p-4 rounded-2xl text-xs max-w-xl leading-relaxed space-y-2 ${
+                          msg.sender === 'user'
+                            ? 'bg-emerald-600 text-white rounded-tr-none'
+                            : 'bg-slate-800/90 text-slate-200 border border-slate-700/60 rounded-tl-none whitespace-pre-line'
+                        }`}>
+                          <p>{msg.text}</p>
+                          <div className="flex items-center justify-between pt-1 text-[10px] opacity-70">
+                            <span>{msg.timestamp}</span>
+                            {msg.sender === 'ai' && (
+                              <button
+                                onClick={() => alert('🔊 অডিও প্লেয়ার চালু হচ্ছে (স্থানীয় ভাষায় পাঠ)...')}
+                                className="flex items-center gap-1 hover:text-emerald-400"
+                              >
+                                <span>🔊</span>
+                                <span>শুনুন</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Input Box */}
+                  <div className="pt-2 flex gap-2">
+                    <input
+                      type="text"
+                      value={voiceText}
+                      onChange={e => setVoiceText(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && handleSendQuery()}
+                      placeholder="ফসলের রোগ, সার বা বাজার দর সম্পর্কে বাংলায় লিখুন..."
+                      className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                    />
+                    <button
+                      onClick={() => handleSendQuery()}
+                      className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-5 py-3 rounded-xl text-xs transition flex items-center gap-1.5 shadow-md shadow-emerald-950"
+                    >
+                      <span>পাঠান</span>
+                      <span>→</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 2: DHENU VISION (PLANT DOCTOR) */}
+            {activeTab === 'doctor' && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                    <span>🔬 প্ল্যান্ট ডক্টর: এআই ছবি রোগ নির্ণয়</span>
+                    <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2.5 py-0.5 rounded-full font-mono">Dhenu Vision V2</span>
+                  </h2>
+                  <p className="text-xs text-slate-400 mt-1">
+                    আক্রান্ত ফসলের পাতার ছবি আপলোড করুন অথবা ক্যামেরা দিয়ে স্ক্যান করুন। এআই তাৎক্ষণিক রোগ শনাক্ত করে অনুমোদিত রাসায়নিক ও জৈব সমাধান দেবে।
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Photo Upload Simulation Card */}
+                  <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4">
+                    <h3 className="font-semibold text-sm text-white">১. আক্রান্ত ফসলের ছবি বাছুন</h3>
+                    <div className="border-2 border-dashed border-slate-700 hover:border-emerald-500 rounded-xl p-8 text-center space-y-3 cursor-pointer bg-slate-950/40 transition">
+                      <div className="text-4xl">📸</div>
+                      <p className="text-xs font-medium text-slate-300">পাতার ছবি ড্র্যাগ করে আনুন অথবা ক্যামেরা খুলুন</p>
+                      <span className="text-[11px] text-slate-500 block">সমর্থিত ফরম্যাট: JPG, PNG (সর্বোচ্চ 15 MB)</span>
+                    </div>
+
+                    <div className="space-y-2">
+                      <span className="text-xs font-semibold text-slate-400 block">বা নমুনা পাতা নির্বাচন করুন:</span>
+                      <div className="grid grid-cols-1 gap-2">
+                        {PLANT_DISEASES.map(d => (
+                          <button
+                            key={d.id}
+                            onClick={() => setSelectedDisease(d)}
+                            className={`p-3 rounded-xl border text-left text-xs transition flex items-center justify-between ${
+                              selectedDisease.id === d.id
+                                ? 'bg-emerald-950/50 border-emerald-500/60 text-emerald-300 font-semibold'
+                                : 'bg-slate-800/40 border-slate-800 text-slate-300 hover:bg-slate-800'
+                            }`}
+                          >
+                            <div>
+                              <span className="block font-medium">{d.crop}</span>
+                              <span className="text-[11px] opacity-75">{d.disease}</span>
+                            </div>
+                            <span className="text-sm">🔍</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* AI Diagnosis Result Card */}
+                  <div className="lg:col-span-2 bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-800 gap-2">
+                      <div>
+                        <span className="text-xs font-mono text-emerald-400 uppercase tracking-wider">{selectedDisease.crop}</span>
+                        <h3 className="text-lg font-bold text-white mt-0.5">{selectedDisease.disease}</h3>
+                        <p className="text-xs text-slate-400 italic">জীবাণু: {selectedDisease.pathogen}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs bg-slate-800 border border-slate-700 px-3 py-1 rounded-full text-slate-300 font-mono">
+                          নির্ভুলতা: <strong className="text-emerald-400">{selectedDisease.confidence}</strong>
+                        </span>
+                        <span className={`text-xs px-2.5 py-1 rounded-full font-bold ${selectedDisease.triangleBg}`}>
+                          {selectedDisease.triangle} Triangle
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider">উপসর্গ ও লক্ষণ:</h4>
+                      <p className="text-xs text-slate-300 bg-slate-950 p-3 rounded-xl border border-slate-800/80">
+                        {selectedDisease.symptoms}
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Organic Remedy */}
+                      <div className="p-4 rounded-xl bg-emerald-950/30 border border-emerald-800/40 space-y-2">
+                        <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                          <span>🌱</span> জৈব ও প্রাকৃতিক প্রতিকার:
+                        </span>
+                        <p className="text-xs text-slate-200 leading-relaxed">
+                          {selectedDisease.organicSolution}
+                        </p>
+                      </div>
+
+                      {/* Chemical Remedy */}
+                      <div className="p-4 rounded-xl bg-blue-950/30 border border-blue-800/40 space-y-2">
+                        <span className="text-xs font-bold text-blue-400 flex items-center gap-1.5">
+                          <span>🧪</span> অনুমোদিত রাসায়নিক প্রতিকার:
+                        </span>
+                        <p className="text-xs text-slate-200 leading-relaxed font-mono text-[11px]">
+                          {selectedDisease.chemicalSolution}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Safety, Dosage & Waiting Period */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs pt-2">
+                      <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
+                        <span className="text-slate-400 block text-[11px]">প্রতি একরে মাত্রা:</span>
+                        <span className="font-semibold text-emerald-400 font-mono mt-0.5 block">{selectedDisease.dosage}</span>
+                      </div>
+                      <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
+                        <span className="text-slate-400 block text-[11px]">প্রতীক্ষা সময় (PHI):</span>
+                        <span className="font-semibold text-amber-400 mt-0.5 block">{selectedDisease.phi}</span>
+                      </div>
+                      <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
+                        <span className="text-slate-400 block text-[11px]">জরুরি সুরক্ষা নির্দেশ:</span>
+                        <span className="font-semibold text-red-400 mt-0.5 block">N95 মাস্ক ও গ্লাভস বাধ্যতামূলক</span>
+                      </div>
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-red-950/30 border border-red-800/40 text-xs text-red-300 flex items-start gap-2">
+                      <span>⚠️</span>
+                      <span><strong>সতর্কতা:</strong> {selectedDisease.caution}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 3: DHENU MARKETS (LIVE MANDI PRICES) */}
+            {activeTab === 'mandi' && (
+              <div className="space-y-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                      <span>📈 লাইভ মান্ডি বাজার দর ও পণ্য অ্যানালিটিক্স</span>
+                    </h2>
+                    <p className="text-xs text-slate-400 mt-1">
+                      ভারতের প্রধান APMC মান্ডির দৈনিক সর্বনিম্ন, সর্বোচ্চ ও মডেল দর আপডেট (ই-নাম ও এগমार्कনেট তথ্যের সাথে সিঙ্ক)।
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-xl text-slate-300 font-mono">
+                      আপডেট: আজ বিকাল ৫:০০
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {MANDI_DATA.map((item, i) => (
+                    <div key={i} className="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl space-y-3 hover:border-slate-700 transition">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <span className="text-xs text-slate-400 block">{item.market}</span>
+                          <h3 className="font-bold text-base text-white mt-0.5">{item.crop}</h3>
+                        </div>
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-bold flex items-center gap-0.5 ${
+                          item.status === 'up' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-red-950 text-red-400 border border-red-800'
+                        }`}>
+                          {item.status === 'up' ? '▲' : '▼'} {item.change}
+                        </span>
+                      </div>
+
+                      <div className="pt-2 border-t border-slate-800/80">
+                        <span className="text-2xl font-extrabold text-white">₹{item.price.toLocaleString()}</span>
+                        <span className="text-xs text-slate-400 ml-1">/ কুইন্টাল</span>
+                      </div>
+
+                      <div className="text-[11px] text-slate-400 flex items-center justify-between pt-1">
+                        <span>মডেল দর</span>
+                        <button onClick={() => alert(`${item.crop} এর গত ৭ দিনের চার্ট এবং স্থানীয় পাইকারি ক্রেতার তথ্য দেখানো হচ্ছে...`)} className="text-emerald-400 hover:underline">
+                          বিস্তারিত দর চার্ট →
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <h3 className="font-bold text-sm text-white">আপনার নিকটস্থ মান্ডির সরাসরি অ্যালার্ট পেতে চান?</h3>
+                    <p className="text-xs text-slate-400">প্রতিদিন সকালে হোয়াটসঅ্যাপ বা এসএমএসের মাধ্যমে আপনার নির্বাচিত ফসলের দর পান।</p>
+                  </div>
+                  <button onClick={() => alert('হোয়াটসঅ্যাপ সাবস্ক্রিপশন সক্রিয় করা হয়েছে!')} className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-5 py-2.5 rounded-xl transition">
+                    📲 হোয়াটসঅ্যাপ অ্যালার্ট চালু করুন
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 4: PESTICIDE & SPRAY CALCULATOR */}
+            {activeTab === 'calculator' && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                    <span>🧪 CIBRC কীটনাশক ও স্প্রে ডোজ ক্যালকুলেটর</span>
+                  </h2>
+                  <p className="text-xs text-slate-400 mt-1">
+                    অতিরিক্ত কীটনাশক ব্যবহারের ফলে ফসলের ক্ষতি ও অর্থ অপচয় রোধ করতে নিখুঁত স্প্রেয়ার ট্যাঙ্কের মাত্রা হিসেব করুন।
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Input Form */}
+                  <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4">
+                    <h3 className="font-semibold text-sm text-white">ক্যালকুলেটর প্যারামিটার</h3>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">১. ফসলের ধরন বাছুন:</label>
+                      <select
+                        value={calcCrop}
+                        onChange={e => setCalcCrop(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+                      >
+                        <option value="paddy">ধান (Paddy) — ট্রাইসাইক্লাজোল / ক্লোরপাইরিফস</option>
+                        <option value="cotton">তুলা (Cotton) — ইমিডাক্লোপ্রিড / এমেমেকটিন</option>
+                        <option value="potato">আলু (Potato) — ম্যানকোজেব ৭৫% ডব্লিউপি</option>
+                        <option value="tomato">টমেটো (Tomato) — অ্যাজোক্সিস্ট্রোবিন</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">২. মোট জমির পরিমাণ (একর):</label>
+                      <input
+                        type="number"
+                        min="0.5"
+                        step="0.5"
+                        value={calcArea}
+                        onChange={e => setCalcArea(parseFloat(e.target.value) || 1)}
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 font-mono"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">৩. স্প্রেয়ার ট্যাঙ্কের মাপ (লিটার):</label>
+                      <select
+                        value={calcTank}
+                        onChange={e => setCalcTank(parseInt(e.target.value))}
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+                      >
+                        <option value="16">১৬ লিটার ন্যাপস্যাক স্প্রেয়ার (Knapsack)</option>
+                        <option value="20">২০ লিটার ব্যাটারি চালিত স্প্রেয়ার</option>
+                        <option value="200">২০০ লিটার ট্র্যাক্টর ড্রাম ব্যারেল</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Calculated Output Card */}
+                  <div className="lg:col-span-2 bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-6">
+                    <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+                      <div>
+                        <span className="text-xs text-emerald-400 font-semibold uppercase tracking-wider">সিআইবিআরসি মান্য হিসেব</span>
+                        <h3 className="text-base font-bold text-white mt-0.5">আপনার {calcArea} একর জমির জন্য প্রয়োজনীয় উপকরণ</h3>
+                      </div>
+                      <span className="text-xs bg-emerald-950 text-emerald-400 border border-emerald-800 px-3 py-1 rounded-full font-bold">
+                        অতিরিক্ত ডোজ রোধক সক্রিয়
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                        <span className="text-xs text-slate-400">প্রতি ট্যাঙ্কে ওষুধের পরিমাণ:</span>
+                        <span className="text-xl font-extrabold text-emerald-400 font-mono block">
+                          {(calcTank * 2.0).toFixed(0)} গ্রাম/মিলি
+                        </span>
+                        <span className="text-[11px] text-slate-500">প্রতি {calcTank} লিটার জলে মেশান</span>
+                      </div>
+
+                      <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                        <span className="text-xs text-slate-400">মোট জল প্রয়োজন:</span>
+                        <span className="text-xl font-extrabold text-blue-400 font-mono block">
+                          {(calcArea * 200).toFixed(0)} লিটার
+                        </span>
+                        <span className="text-[11px] text-slate-500">মোট {Math.ceil((calcArea * 200) / calcTank)} টি স্প্রে ট্যাঙ্ক</span>
+                      </div>
+
+                      <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                        <span className="text-xs text-slate-400">মোট ওষুধ প্রয়োজন:</span>
+                        <span className="text-xl font-extrabold text-amber-400 font-mono block">
+                          {(calcArea * 400).toFixed(0)} গ্রাম/মিলি
+                        </span>
+                        <span className="text-[11px] text-slate-500">{calcArea} একর মোট ক্ষেত্রফল</span>
+                      </div>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 space-y-2">
+                      <h4 className="font-semibold text-xs text-slate-200">কৃষি বিজ্ঞানীদের স্প্রে করার সুবর্ণ নিয়ম:</h4>
+                      <ul className="text-xs text-slate-400 space-y-1 list-disc list-inside">
+                        <li>কখনই নির্দেশিত মাত্রার চেয়ে বেশি স্প্রে করবেন না; এতে ফসলে কেমিক্যাল বার্ন হয়।</li>
+                        <li>ন্যাপস্যাক স্প্রেয়ারের নোজল সমান্তরাল রাখুন এবং খালি পেটে স্প্রে করবেন না।</li>
+                        <li>খালি ওষুধের বোতল বা প্যাকেট পুকুর ও খালবিল থেকে দূরে মাটিতে পুঁতে ফেলুন।</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 5: GOVT SCHEMES & SUBSIDIES */}
+            {activeTab === 'schemes' && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                    <span>🏛️ কেন্দ্রীয় ও রাজ্য সরকারি কৃষক যোজনা ডিরেক্টরি</span>
+                  </h2>
+                  <p className="text-xs text-slate-400 mt-1">
+                    কৃষকদের জন্য সরকারি অনুদান, ভর্তুকিযুক্ত কৃষি যন্ত্রপাতি ও ফসল বিমার আবেদন প্রক্রিয়া।
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {[
+                    {
+                      name: "প্রধানমন্ত্রী কিষাণ সম্মান নিধি (PM-Kisan)",
+                      dept: "কৃষি ও কৃষক কল্যাণ মন্ত্রক",
+                      benefit: "বার্ষিক ₹৬,০০০ সরাসরি ব্যাংক একাউন্টে (প্রতি ৪ মাসে ₹২,০০০)",
+                      eligibility: "সকল ক্ষুদ্র ও প্রান্তিক চাষী পরিবার যাদের আবাদি জমি রয়েছে।",
+                      action: "কেওয়াইসি স্ট্যাটাস চেক করুন"
+                    },
+                    {
+                      name: "প্রধানমন্ত্রী ফসল বিমা যোজনা (PMFBY)",
+                      dept: "জাতীয় ফসল বিমা পোর্টাল",
+                      benefit: "খরা, অতিবৃষ্টি, শিলাবৃষ্টি বা কীটপতঙ্গের আক্রমণে ফসলের ক্ষতিপূরণ।",
+                      eligibility: "খরিফ ফসলে ২% ও রবি ফসলে ১.৫% নামমাত্র প্রিমিয়ামে সম্পূর্ণ কভারেজ।",
+                      action: "বিমা দাবি ও পলিসি স্ট্যাটাস"
+                    },
+                    {
+                      name: "পিএম কুসুম সোলার পাম্প যোজনা (PM-KUSUM)",
+                      dept: "পুনর্নবীকরণযোগ্য শক্তি মন্ত্রক",
+                      benefit: "সৌরশক্তি চালিত সেচ পাম্প স্থাপনে ৬০% পর্যন্ত সরকারি ভর্তুকি।",
+                      eligibility: "যেসব চাষীর সেচের জন্য বিদ্যুৎ সংযোগ নেই বা ডিজেল পাম্প ব্যবহার করেন।",
+                      action: "সোলার পাম্পের আবেদন করুন"
+                    }
+                  ].map((s, idx) => (
+                    <div key={idx} className="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl flex flex-col justify-between space-y-4">
+                      <div className="space-y-2.5">
+                        <span className="text-[11px] font-mono text-emerald-400 uppercase tracking-wider">{s.dept}</span>
+                        <h3 className="font-bold text-base text-white">{s.name}</h3>
+                        <div className="text-xs space-y-1.5 text-slate-300">
+                          <div><strong className="text-slate-400">সুবিধা:</strong> {s.benefit}</div>
+                          <div><strong className="text-slate-400">যোগ্যতা:</strong> {s.eligibility}</div>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => alert(`${s.name} সংক্রান্ত বিস্তারিত বিবরণ ও আবেদন লিঙ্ক তৈরি হচ্ছে...`)}
+                        className="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs py-2.5 rounded-xl transition border border-slate-700/60"
+                      >
+                        {s.action} →
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+          </main>
+
+          {/* Footer */}
+          <footer className="mt-12 border-t border-slate-800/80 bg-slate-950 py-8 px-4 text-center text-xs text-slate-500">
+            <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <span className="text-emerald-400 font-bold text-sm">KissanAI</span>
+                <span>•</span>
+                <span>Dhenu Agricultural Foundation Model Architecture</span>
+              </div>
+              <p>© 2026 KissanAI. Open Source Platform dedicated to Indian Farmers.</p>
+              <div className="flex gap-4">
+                <a href="https://github.com/guptavedansh665-glitch/Hackday-Hactober" target="_blank" className="hover:text-emerald-400">GitHub</a>
+                <a href="#" className="hover:text-emerald-400">Privacy Policy</a>
+                <a href="#" className="hover:text-emerald-400">Terms of Service</a>
+              </div>
+            </div>
+          </footer>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

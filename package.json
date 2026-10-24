@@ -1,0 +1,21 @@
+{
+  "name": "kissan-ai",
+  "version": "2.0.0",
+  "description": "KissanAI — Dhenu Agricultural AI Operating System & Farm Advisory Dashboard",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "kissan-ai",
+    "dhenu",
+    "agriculture",
+    "mandi-prices",
+    "crop-disease-diagnosis",
+    "voice-assistant",
+    "indic-languages"
+  ],
+  "author": "KissanAI Community",
+  "license": "Apache-2.0"
+}
