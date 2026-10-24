@@ -2115,7 +2115,7 @@ const MULTI_SCHEMES = [
     "helpline": "011-2338-8911",
     "status": "Active"
   }
-]];
+];
 
 // CIBRC Canonical Pesticide Label Registry
 const SAMPLE_PESTICIDES = [

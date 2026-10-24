@@ -12,6 +12,8 @@
     const Component = window.App || (typeof App !== 'undefined' ? App : null);
     if (Component) {
       window.__KISAN_APP_MOUNTED__ = true;
+      const box = document.getElementById('client-error-box');
+      if (box) box.classList.add('hidden');
       const root = ReactDOM.createRoot(rootElement);
       root.render(React.createElement(Component));
       console.log('✅ [KissanAI] React Application mounted successfully via index.jsx.');
