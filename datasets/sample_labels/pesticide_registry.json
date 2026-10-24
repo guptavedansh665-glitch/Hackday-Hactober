@@ -1,0 +1,86 @@
+{
+  "registry_version": "1.0.0",
+  "data_license": "ODbL-1.0 (Open Database License) / Public Government Source",
+  "source": "Central Insecticides Board & Registration Committee (CIBRC), Directorate of Plant Protection, Quarantine & Storage, Govt. of India",
+  "disclaimer": "This dataset contains strictly anonymized and publicly published pesticide label instructions for educational, safety testing, and community translation purposes. Contains no personal or proprietary commercial secrets.",
+  "labels": [
+    {
+      "id": "CIBRC-CHL-001",
+      "chemical_name": "Chlorpyrifos 20% EC",
+      "brand_name_sample": "Dursban / Classic 20 (Generic Formulation)",
+      "cas_number": "2921-88-2",
+      "toxicity_triangle": "Yellow",
+      "toxicity_label_en": "WARNING - HIGHLY TOXIC",
+      "approved_crops": ["Paddy", "Cotton", "Sugarcane", "Groundnut"],
+      "target_pests": ["Stem borer", "Leaf folder", "Termites", "Aphids"],
+      "recommended_dosage": {
+        "amount": "2.0 ml to 2.5 ml",
+        "per_water_unit": "1 Litre",
+        "dilution_ratio_per_acre": "400 ml to 500 ml in 200 Litres of water"
+      },
+      "pre_harvest_interval_days": 15,
+      "ppe_required": [
+        "Nitrile rubber gloves",
+        "N95 organic vapor particulate respirator",
+        "Chemical splash goggles",
+        "Rubber gumboots",
+        "Full sleeve apron"
+      ],
+      "antidote_instructions_en": "Administer Atropine sulphate intravenously (2-4 mg every 10-15 minutes until signs of atropinization occur). Pralidoxime (2-PAM) may be administered under strict physician guidance. Do not induce vomiting if patient is unconscious.",
+      "environmental_hazards": "Extremely toxic to fish, aquatic invertebrates, and pollinator honeybees. Avoid spraying during bloom.",
+      "verification_status": "Reviewed and Approved by Agricultural Safety Board",
+      "verified_date": "2026-10-15"
+    },
+    {
+      "id": "CIBRC-IMI-002",
+      "chemical_name": "Imidacloprid 17.8% SL",
+      "brand_name_sample": "Confidor (Generic Formulation)",
+      "cas_number": "138261-41-3",
+      "toxicity_triangle": "Blue",
+      "toxicity_label_en": "CAUTION - MODERATELY TOXIC",
+      "approved_crops": ["Cotton", "Paddy", "Chilli", "Tomato", "Mango"],
+      "target_pests": ["Aphids", "Whiteflies", "Jassids", "Thrips", "Brown Plant Hopper"],
+      "recommended_dosage": {
+        "amount": "0.5 ml to 0.75 ml",
+        "per_water_unit": "1 Litre",
+        "dilution_ratio_per_acre": "100 ml to 150 ml in 200 Litres of water"
+      },
+      "pre_harvest_interval_days": 21,
+      "ppe_required": [
+        "Protective gloves",
+        "Dust/mist mask",
+        "Eye protective glasses",
+        "Long trousers and full sleeve shirt"
+      ],
+      "antidote_instructions_en": "No specific antidote known. Treat symptomatically and give gastric lavage if swallowed. Maintain electrolyte balance.",
+      "environmental_hazards": "Highly toxic to honeybees. Do not apply when bees are actively foraging in the field.",
+      "verification_status": "Reviewed and Approved by Agricultural Safety Board",
+      "verified_date": "2026-10-18"
+    },
+    {
+      "id": "CIBRC-MAN-003",
+      "chemical_name": "Mancozeb 75% WP",
+      "brand_name_sample": "Dithane M-45 (Generic Formulation)",
+      "cas_number": "8018-01-7",
+      "toxicity_triangle": "Green",
+      "toxicity_label_en": "CAUTION - SLIGHTLY TOXIC",
+      "approved_crops": ["Potato", "Tomato", "Wheat", "Grapes", "Apple"],
+      "target_pests": ["Late blight", "Early blight", "Rust", "Downy mildew", "Scab"],
+      "recommended_dosage": {
+        "amount": "2.0 g to 2.5 g",
+        "per_water_unit": "1 Litre",
+        "dilution_ratio_per_acre": "600 g to 800 g in 300 Litres of water"
+      },
+      "pre_harvest_interval_days": 7,
+      "ppe_required": [
+        "Dust mask",
+        "Rubber gloves",
+        "Protective eyewear"
+      ],
+      "antidote_instructions_en": "No specific antidote known. Empty stomach by gastric lavage with warm sodium bicarbonate solution. Treat symptomatically.",
+      "environmental_hazards": "Toxic to fish. Do not contaminate pond water, irrigation canals, or water sources.",
+      "verification_status": "Reviewed and Approved by Agricultural Safety Board",
+      "verified_date": "2026-10-20"
+    }
+  ]
+}
