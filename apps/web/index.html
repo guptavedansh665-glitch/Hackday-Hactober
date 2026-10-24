@@ -18,24 +18,20 @@
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
     .font-indic { font-family: 'Noto Sans Bengali', 'Noto Sans Devanagari', 'Plus Jakarta Sans', sans-serif; }
-    .bg-grid-pattern {
-      background-image: radial-gradient(rgba(16, 185, 129, 0.08) 1px, transparent 1px);
+    .bg-light-pattern {
+      background-color: #f8fafc;
+      background-image: radial-gradient(rgba(16, 185, 129, 0.12) 1.2px, transparent 1.2px);
       background-size: 24px 24px;
     }
     @keyframes pulse-ring {
       0% { transform: scale(0.95); opacity: 0.8; }
-      50% { transform: scale(1.15); opacity: 0.3; }
+      50% { transform: scale(1.15); opacity: 0.25; }
       100% { transform: scale(0.95); opacity: 0.8; }
     }
     .pulse-ring { animation: pulse-ring 2.5s infinite ease-in-out; }
-    .glass-card {
-      background: rgba(15, 23, 42, 0.82);
-      backdrop-filter: blur(14px);
-      border: 1px solid rgba(51, 65, 85, 0.65);
-    }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen bg-grid-pattern antialiased selection:bg-emerald-500 selection:text-white">
+<body class="bg-light-pattern text-slate-800 min-h-screen antialiased selection:bg-emerald-500 selection:text-white">
   <div id="root"></div>
 
   <script type="text/babel">
@@ -402,7 +398,7 @@
         pathogen: "Magnaporthe oryzae / Bipolaris oryzae",
         confidence: "98.2%",
         triangle: "Yellow",
-        triangleBg: "bg-amber-500 text-slate-950",
+        triangleBg: "bg-amber-100 text-amber-900 border border-amber-300",
         symptoms: {
           bn: "পাতার ওপর মাকু আকৃতির বাদামী প্রান্তবিশিষ্ট দাগ এবং শীষের গোড়ায় পচন।",
           hi: "पत्तियों पर नाव या धुरी के आकार के भूरे किनारे वाले धब्बे और बालियों का सूखना।",
@@ -452,7 +448,7 @@
         pathogen: "Pectinophora gossypiella",
         confidence: "96.7%",
         triangle: "Red",
-        triangleBg: "bg-red-500 text-white",
+        triangleBg: "bg-red-100 text-red-900 border border-red-300",
         symptoms: {
           bn: "গোলাপের মতো পাপড়ি বন্ধ ফুল, বন্ডে ছিদ্র এবং দাগযুক্ত তুলো।",
           hi: "गुलाब जैसे बंद फूल, गूलर में छेद, रुई का खराब होना और बोंडों का समय से पहले गिरना।",
@@ -502,7 +498,7 @@
         pathogen: "Alternaria solani / Phytophthora infestans",
         confidence: "94.5%",
         triangle: "Green",
-        triangleBg: "bg-emerald-500 text-white",
+        triangleBg: "bg-emerald-100 text-emerald-900 border border-emerald-300",
         symptoms: {
           bn: "নীচের পাতায় গোল চক্রাকার দাগ, ডাঁটায় কালো ক্ষত এবং ফল পচা।",
           hi: "निचली पत्तियों पर गोल छल्लेदार गहरे धब्बे और तने पर काले घाव।",
@@ -517,7 +513,7 @@
         },
         chemical: {
           bn: "ম্যানকোজেব ৭৫% ডব্লিউপি প্রতি লিটার জলে ২.০ থেকে ২.৫ গ্রাম মেশান।",
-          hi: "मैंकोजेब ७५% डब्ल्यूपी २.० से २.५ ग्राम प्रति लीटर पानी में घोलकर छिड़कें।",
+          hi: "मैंकोजेब ७५% डब्ल्यूपी २.० से २.৫ ग्राम प्रति लीटर पानी में घोलकर छिड़कें।",
           mr: "मँकोझेब ७५% डब्ल्यूपी २.० ते २.५ ग्रॅम प्रति लिटर पाण्यात मिसळून फवारा.",
           en: "Mancozeb 75% WP @ 2.0g to 2.5g per Litre of clean water."
         },
@@ -775,42 +771,42 @@
       return (
         <div className="min-h-screen flex flex-col font-indic">
           {/* Top Banner / Ticker */}
-          <div className="bg-emerald-950/85 border-b border-emerald-800/40 px-4 py-1.5 text-xs text-emerald-300 flex items-center justify-between overflow-x-auto whitespace-nowrap">
+          <div className="bg-emerald-50 border-b border-emerald-200/80 px-4 py-2 text-xs text-emerald-900 flex items-center justify-between overflow-x-auto whitespace-nowrap shadow-xs">
             <div className="flex items-center gap-4">
-              <span className="flex items-center gap-1.5 font-semibold text-emerald-400">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <span className="flex items-center gap-1.5 font-bold text-emerald-700 bg-emerald-100/80 px-2.5 py-0.5 rounded-full border border-emerald-300">
+                <span className="w-2 h-2 rounded-full bg-emerald-600 animate-ping"></span>
                 {t.badgeLive}
               </span>
               <span>•</span>
-              <span>{t.tickerWeather}</span>
+              <span className="font-medium text-slate-700">{t.tickerWeather}</span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="bg-emerald-900/60 text-emerald-200 px-2 py-0.5 rounded text-[11px] font-mono border border-emerald-700/50">
+              <span className="bg-white text-emerald-800 px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-emerald-300 shadow-xs">
                 {t.cibrcBadge}
               </span>
             </div>
           </div>
 
           {/* Navigation Bar */}
-          <header className="glass-card sticky top-0 z-50 border-b border-slate-800 px-4 lg:px-8 py-3.5">
+          <header className="bg-white/95 sticky top-0 z-50 border-b border-slate-200 shadow-sm backdrop-blur-md px-4 lg:px-8 py-3.5">
             <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20 text-2xl font-bold">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shadow-md shadow-emerald-600/20 text-2xl font-bold">
                   🌾
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-extrabold text-lg text-white tracking-tight">Kissan<span className="text-emerald-400">AI</span></span>
-                    <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                    <span className="font-extrabold text-xl text-slate-900 tracking-tight">Kissan<span className="text-emerald-600">AI</span></span>
+                    <span className="bg-emerald-100 text-emerald-800 border border-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
                       Dhenu OS
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-400 -mt-0.5">{t.appTagline}</p>
+                  <p className="text-[11px] text-slate-500 font-medium -mt-0.5">{t.appTagline}</p>
                 </div>
               </div>
 
               {/* Navigation Tabs */}
-              <nav className="hidden lg:flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800 text-xs font-semibold">
+              <nav className="hidden lg:flex items-center gap-1 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200 text-xs font-semibold">
                 {[
                   { id: 'advisor', label: t.tabs.advisor, icon: '🎙️' },
                   { id: 'doctor', label: t.tabs.doctor, icon: '🔬' },
@@ -821,10 +817,10 @@
                   <button
                     key={item.id}
                     onClick={() => setActiveTab(item.id)}
-                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg transition-all ${
+                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl transition-all ${
                       activeTab === item.id
-                        ? 'bg-emerald-600 text-white shadow-md shadow-emerald-900/40'
-                        : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                        ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/25 font-bold'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white'
                     }`}
                   >
                     <span>{item.icon}</span>
@@ -835,17 +831,17 @@
 
               {/* Language Switcher */}
               <div className="flex items-center gap-2">
-                <div className="flex items-center bg-slate-900 border border-emerald-500/40 rounded-xl px-3 py-1.5 shadow-sm">
+                <div className="flex items-center bg-white border border-slate-300 rounded-xl px-3 py-1.5 shadow-xs">
                   <span className="text-sm mr-2">🌐</span>
                   <select
                     value={lang}
                     onChange={e => handleLanguageChange(e.target.value)}
-                    className="bg-transparent text-xs font-bold text-emerald-400 focus:outline-none cursor-pointer"
+                    className="bg-transparent text-xs font-bold text-slate-800 focus:outline-none cursor-pointer"
                   >
-                    <option value="bn" className="bg-slate-900 text-slate-200">বাংলা (Bengali)</option>
-                    <option value="hi" className="bg-slate-900 text-slate-200">हिन्दी (Hindi)</option>
-                    <option value="mr" className="bg-slate-900 text-slate-200">मराठी (Marathi)</option>
-                    <option value="en" className="bg-slate-900 text-slate-200">English</option>
+                    <option value="bn" className="text-slate-900">বাংলা (Bengali)</option>
+                    <option value="hi" className="text-slate-900">हिन्दी (Hindi)</option>
+                    <option value="mr" className="text-slate-900">मराठी (Marathi)</option>
+                    <option value="en" className="text-slate-900">English</option>
                   </select>
                 </div>
               </div>
@@ -859,17 +855,17 @@
             {activeTab === 'advisor' && (
               <div className="space-y-6">
                 {/* Hero Voice Card */}
-                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-950/60 via-slate-900 to-slate-900 border border-emerald-900/40 p-6 md:p-8 shadow-2xl">
+                <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-50 via-white to-teal-50/40 border border-emerald-200/80 p-6 md:p-10 shadow-sm">
                   <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
-                    <div className="space-y-3 text-center lg:text-left max-w-2xl">
-                      <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs px-3 py-1 rounded-full font-medium">
+                    <div className="space-y-3.5 text-center lg:text-left max-w-2xl">
+                      <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs px-3.5 py-1 rounded-full font-bold">
                         <span>🇮🇳</span>
                         <span>{t.hero.tag}</span>
                       </div>
-                      <h1 className="text-2xl md:text-4xl font-extrabold text-white leading-tight">
+                      <h1 className="text-2xl md:text-4xl font-extrabold text-slate-900 leading-tight">
                         {t.hero.title}
                       </h1>
-                      <p className="text-sm text-slate-300 leading-relaxed">
+                      <p className="text-sm text-slate-600 leading-relaxed font-normal">
                         {t.hero.desc}
                       </p>
                     </div>
@@ -878,29 +874,29 @@
                     <div className="flex flex-col items-center justify-center gap-3">
                       <div className="relative flex items-center justify-center">
                         {isListening && (
-                          <div className="absolute w-28 h-28 rounded-full bg-emerald-500/20 pulse-ring"></div>
+                          <div className="absolute w-28 h-28 rounded-full bg-emerald-500/25 pulse-ring"></div>
                         )}
                         <button
                           onClick={toggleVoice}
                           className={`w-20 h-20 rounded-full flex items-center justify-center text-3xl shadow-xl transition-all duration-300 ${
                             isListening
-                              ? 'bg-red-500 text-white scale-110 shadow-red-500/30 ring-4 ring-red-400/30'
-                              : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 hover:scale-105 shadow-emerald-500/30'
+                              ? 'bg-red-500 text-white scale-110 shadow-red-500/30 ring-4 ring-red-400/40'
+                              : 'bg-emerald-600 hover:bg-emerald-500 text-white hover:scale-105 shadow-emerald-600/30 ring-4 ring-emerald-100'
                           }`}
                         >
                           {isListening ? '🛑' : '🎙️'}
                         </button>
                       </div>
-                      <span className="text-xs font-semibold text-slate-300">
+                      <span className="text-xs font-bold text-slate-700">
                         {isListening ? t.hero.listening : t.hero.tapToSpeak}
                       </span>
                     </div>
                   </div>
 
                   {/* Sample Voice Prompts Chips */}
-                  <div className="mt-8 pt-6 border-t border-slate-800/80">
-                    <p className="text-xs font-medium text-slate-400 mb-2.5">{t.hero.commonQuestions}</p>
-                    <div className="flex flex-wrap gap-2">
+                  <div className="mt-8 pt-6 border-t border-slate-200">
+                    <p className="text-xs font-bold text-slate-700 mb-3">{t.hero.commonQuestions}</p>
+                    <div className="flex flex-wrap gap-2.5">
                       {lang === 'bn' && [
                         "ধানের পাতায় বাদামী দাগ ও ধসা রোগ হয়েছে, কী স্প্রে করব?",
                         "আজকে বর্ধমান বাজারে আমন ধানের সরকারি দর কত?",
@@ -910,9 +906,9 @@
                         <button
                           key={idx}
                           onClick={() => handleSendQuery(prompt)}
-                          className="bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 hover:text-white border border-slate-700/60 rounded-xl px-3.5 py-1.5 text-xs transition flex items-center gap-2"
+                          className="bg-white hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 border border-slate-200 hover:border-emerald-300 rounded-xl px-4 py-2 text-xs font-medium transition shadow-xs flex items-center gap-2"
                         >
-                          <span className="text-emerald-400">💬</span>
+                          <span className="text-emerald-600 font-bold">💬</span>
                           <span>{prompt}</span>
                         </button>
                       ))}
@@ -926,9 +922,9 @@
                         <button
                           key={idx}
                           onClick={() => handleSendQuery(prompt)}
-                          className="bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 hover:text-white border border-slate-700/60 rounded-xl px-3.5 py-1.5 text-xs transition flex items-center gap-2"
+                          className="bg-white hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 border border-slate-200 hover:border-emerald-300 rounded-xl px-4 py-2 text-xs font-medium transition shadow-xs flex items-center gap-2"
                         >
-                          <span className="text-emerald-400">💬</span>
+                          <span className="text-emerald-600 font-bold">💬</span>
                           <span>{prompt}</span>
                         </button>
                       ))}
@@ -942,9 +938,9 @@
                         <button
                           key={idx}
                           onClick={() => handleSendQuery(prompt)}
-                          className="bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 hover:text-white border border-slate-700/60 rounded-xl px-3.5 py-1.5 text-xs transition flex items-center gap-2"
+                          className="bg-white hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 border border-slate-200 hover:border-emerald-300 rounded-xl px-4 py-2 text-xs font-medium transition shadow-xs flex items-center gap-2"
                         >
-                          <span className="text-emerald-400">💬</span>
+                          <span className="text-emerald-600 font-bold">💬</span>
                           <span>{prompt}</span>
                         </button>
                       ))}
@@ -958,9 +954,9 @@
                         <button
                           key={idx}
                           onClick={() => handleSendQuery(prompt)}
-                          className="bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 hover:text-white border border-slate-700/60 rounded-xl px-3.5 py-1.5 text-xs transition flex items-center gap-2"
+                          className="bg-white hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 border border-slate-200 hover:border-emerald-300 rounded-xl px-4 py-2 text-xs font-medium transition shadow-xs flex items-center gap-2"
                         >
-                          <span className="text-emerald-400">💬</span>
+                          <span className="text-emerald-600 font-bold">💬</span>
                           <span>{prompt}</span>
                         </button>
                       ))}
@@ -969,35 +965,37 @@
                 </div>
 
                 {/* Live Chat Conversation Feed */}
-                <div className="bg-slate-900/80 rounded-2xl border border-slate-800 p-5 space-y-4">
-                  <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">🌾</span>
-                      <h3 className="font-bold text-sm text-white">{t.hero.chatTitle}</h3>
+                <div className="bg-white rounded-3xl border border-slate-200 p-6 space-y-4 shadow-sm">
+                  <div className="flex items-center justify-between border-b border-slate-200 pb-3.5">
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-xl">🌾</span>
+                      <h3 className="font-extrabold text-sm text-slate-900">{t.hero.chatTitle}</h3>
                     </div>
-                    <span className="text-xs text-slate-400">{t.hero.chatSupport}</span>
+                    <span className="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-medium border border-slate-200">
+                      {t.hero.chatSupport}
+                    </span>
                   </div>
 
                   <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
                     {chatMessages.map((msg, i) => (
                       <div key={i} className={`flex gap-3 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                         {msg.sender === 'ai' && (
-                          <div className="w-8 h-8 rounded-lg bg-emerald-600/30 border border-emerald-500/40 flex items-center justify-center text-sm flex-shrink-0">
+                          <div className="w-9 h-9 rounded-xl bg-emerald-100 border border-emerald-300 text-emerald-900 flex items-center justify-center text-base flex-shrink-0 font-bold shadow-xs">
                             🌾
                           </div>
                         )}
-                        <div className={`p-4 rounded-2xl text-xs max-w-xl leading-relaxed space-y-2 ${
+                        <div className={`p-4 rounded-2xl text-xs max-w-xl leading-relaxed space-y-2 shadow-xs ${
                           msg.sender === 'user'
-                            ? 'bg-emerald-600 text-white rounded-tr-none'
-                            : 'bg-slate-800/90 text-slate-200 border border-slate-700/60 rounded-tl-none whitespace-pre-line'
+                            ? 'bg-emerald-600 text-white rounded-tr-none font-medium'
+                            : 'bg-slate-50 text-slate-800 border border-slate-200 rounded-tl-none whitespace-pre-line'
                         }`}>
                           <p>{msg.text}</p>
-                          <div className="flex items-center justify-between pt-1 text-[10px] opacity-70">
+                          <div className="flex items-center justify-between pt-1 text-[10px] opacity-75">
                             <span>{msg.timestamp}</span>
                             {msg.sender === 'ai' && (
                               <button
                                 onClick={() => alert('🔊 Audio response playing in ' + lang.toUpperCase())}
-                                className="flex items-center gap-1 hover:text-emerald-400"
+                                className="flex items-center gap-1 font-bold text-emerald-700 hover:text-emerald-800"
                               >
                                 <span>🔊</span>
                                 <span>{t.hero.listenAudio}</span>
@@ -1017,11 +1015,11 @@
                       onChange={e => setVoiceText(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && handleSendQuery()}
                       placeholder={t.hero.inputPlaceholder}
-                      className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                      className="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
                     />
                     <button
                       onClick={() => handleSendQuery()}
-                      className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-5 py-3 rounded-xl text-xs transition flex items-center gap-1.5 shadow-md shadow-emerald-950"
+                      className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-3 rounded-xl text-xs transition flex items-center gap-1.5 shadow-sm shadow-emerald-600/30"
                     >
                       <span>{t.hero.sendBtn}</span>
                       <span>→</span>
@@ -1035,27 +1033,27 @@
             {activeTab === 'doctor' && (
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                  <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
                     <span>🔬 {t.doctor.title}</span>
-                    <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2.5 py-0.5 rounded-full font-mono">Dhenu Vision V2</span>
+                    <span className="text-xs bg-emerald-100 text-emerald-800 border border-emerald-300 px-2.5 py-0.5 rounded-full font-bold">Dhenu Vision V2</span>
                   </h2>
-                  <p className="text-xs text-slate-400 mt-1">
+                  <p className="text-xs text-slate-600 mt-1">
                     {t.doctor.desc}
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   {/* Photo Upload Simulator Card */}
-                  <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4">
-                    <h3 className="font-semibold text-sm text-white">{t.doctor.step1}</h3>
-                    <div className="border-2 border-dashed border-slate-700 hover:border-emerald-500 rounded-xl p-8 text-center space-y-3 cursor-pointer bg-slate-950/40 transition">
+                  <div className="bg-white border border-slate-200 rounded-3xl p-6 space-y-4 shadow-sm">
+                    <h3 className="font-bold text-sm text-slate-900">{t.doctor.step1}</h3>
+                    <div className="border-2 border-dashed border-slate-300 hover:border-emerald-500 rounded-2xl p-8 text-center space-y-3 cursor-pointer bg-slate-50/70 transition">
                       <div className="text-4xl">📸</div>
-                      <p className="text-xs font-medium text-slate-300">{t.doctor.dragText}</p>
+                      <p className="text-xs font-bold text-slate-800">{t.doctor.dragText}</p>
                       <span className="text-[11px] text-slate-500 block">{t.doctor.formats}</span>
                     </div>
 
                     <div className="space-y-2">
-                      <span className="text-xs font-semibold text-slate-400 block">{t.doctor.samplePrompt}</span>
+                      <span className="text-xs font-bold text-slate-700 block">{t.doctor.samplePrompt}</span>
                       <div className="grid grid-cols-1 gap-2">
                         {['paddy', 'cotton', 'tomato'].map(ck => {
                           const item = MULTI_DISEASES[ck];
@@ -1063,15 +1061,15 @@
                             <button
                               key={ck}
                               onClick={() => setSelectedCropKey(ck)}
-                              className={`p-3 rounded-xl border text-left text-xs transition flex items-center justify-between ${
+                              className={`p-3.5 rounded-2xl border text-left text-xs transition flex items-center justify-between ${
                                 selectedCropKey === ck
-                                  ? 'bg-emerald-950/50 border-emerald-500/60 text-emerald-300 font-semibold'
-                                  : 'bg-slate-800/40 border-slate-800 text-slate-300 hover:bg-slate-800'
+                                  ? 'bg-emerald-50 border-emerald-400 text-emerald-900 font-bold shadow-xs'
+                                  : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                               }`}
                             >
                               <div>
-                                <span className="block font-medium">{item.crops[lang] || item.crops.en}</span>
-                                <span className="text-[11px] opacity-75">{item.disease[lang] || item.disease.en}</span>
+                                <span className="block font-bold">{item.crops[lang] || item.crops.en}</span>
+                                <span className="text-[11px] font-normal text-slate-500">{item.disease[lang] || item.disease.en}</span>
                               </div>
                               <span className="text-sm">🔍</span>
                             </button>
@@ -1082,77 +1080,77 @@
                   </div>
 
                   {/* AI Diagnosis Result Card */}
-                  <div className="lg:col-span-2 bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-800 gap-2">
+                  <div className="lg:col-span-2 bg-white border border-slate-200 rounded-3xl p-6 space-y-6 shadow-sm">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 gap-2">
                       <div>
-                        <span className="text-xs font-mono text-emerald-400 uppercase tracking-wider">
+                        <span className="text-xs font-mono font-bold text-emerald-700 uppercase tracking-wider">
                           {currentDisease.crops[lang] || currentDisease.crops.en}
                         </span>
-                        <h3 className="text-lg font-bold text-white mt-0.5">
+                        <h3 className="text-lg font-extrabold text-slate-900 mt-0.5">
                           {currentDisease.disease[lang] || currentDisease.disease.en}
                         </h3>
-                        <p className="text-xs text-slate-400 italic">Pathogen: {currentDisease.pathogen}</p>
+                        <p className="text-xs text-slate-500 italic font-medium">Pathogen: {currentDisease.pathogen}</p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs bg-slate-800 border border-slate-700 px-3 py-1 rounded-full text-slate-300 font-mono">
-                          {t.doctor.accuracyLabel} <strong className="text-emerald-400">{currentDisease.confidence}</strong>
+                        <span className="text-xs bg-slate-100 border border-slate-200 px-3 py-1 rounded-full text-slate-700 font-medium font-mono">
+                          {t.doctor.accuracyLabel} <strong className="text-emerald-700 font-bold">{currentDisease.confidence}</strong>
                         </span>
-                        <span className={`text-xs px-2.5 py-1 rounded-full font-bold ${currentDisease.triangleBg}`}>
+                        <span className={`text-xs px-3 py-1 rounded-full font-bold shadow-xs ${currentDisease.triangleBg}`}>
                           {currentDisease.triangle} Triangle
                         </span>
                       </div>
                     </div>
 
-                    <div className="space-y-3">
-                      <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider">{t.doctor.symptomsLabel}</h4>
-                      <p className="text-xs text-slate-300 bg-slate-950 p-3 rounded-xl border border-slate-800/80 leading-relaxed">
+                    <div className="space-y-2">
+                      <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">{t.doctor.symptomsLabel}</h4>
+                      <p className="text-xs text-slate-700 bg-slate-50 p-3.5 rounded-2xl border border-slate-200 leading-relaxed font-medium">
                         {currentDisease.symptoms[lang] || currentDisease.symptoms.en}
                       </p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Organic Remedy */}
-                      <div className="p-4 rounded-xl bg-emerald-950/30 border border-emerald-800/40 space-y-2">
-                        <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                      <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-2">
+                        <span className="text-xs font-bold text-emerald-800 flex items-center gap-1.5">
                           <span>🌱</span> {t.doctor.organicLabel}
                         </span>
-                        <p className="text-xs text-slate-200 leading-relaxed">
+                        <p className="text-xs text-slate-700 leading-relaxed">
                           {currentDisease.organic[lang] || currentDisease.organic.en}
                         </p>
                       </div>
 
                       {/* Chemical Remedy */}
-                      <div className="p-4 rounded-xl bg-blue-950/30 border border-blue-800/40 space-y-2">
-                        <span className="text-xs font-bold text-blue-400 flex items-center gap-1.5">
+                      <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200 space-y-2">
+                        <span className="text-xs font-bold text-blue-800 flex items-center gap-1.5">
                           <span>🧪</span> {t.doctor.chemicalLabel}
                         </span>
-                        <p className="text-xs text-slate-200 leading-relaxed font-mono text-[11px]">
+                        <p className="text-xs text-slate-700 leading-relaxed font-mono text-[11px]">
                           {currentDisease.chemical[lang] || currentDisease.chemical.en}
                         </p>
                       </div>
                     </div>
 
                     {/* Safety, Dosage & Waiting Period */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs pt-2">
-                      <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-                        <span className="text-slate-400 block text-[11px]">{t.doctor.acreDoseLabel}</span>
-                        <span className="font-semibold text-emerald-400 font-mono mt-0.5 block">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs pt-1">
+                      <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                        <span className="text-slate-500 block text-[11px] font-medium">{t.doctor.acreDoseLabel}</span>
+                        <span className="font-bold text-emerald-700 font-mono mt-0.5 block">
                           {currentDisease.dosage[lang] || currentDisease.dosage.en}
                         </span>
                       </div>
-                      <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-                        <span className="text-slate-400 block text-[11px]">{t.doctor.phiLabel}</span>
-                        <span className="font-semibold text-amber-400 mt-0.5 block">
+                      <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                        <span className="text-slate-500 block text-[11px] font-medium">{t.doctor.phiLabel}</span>
+                        <span className="font-bold text-amber-700 mt-0.5 block">
                           {currentDisease.phi[lang] || currentDisease.phi.en}
                         </span>
                       </div>
-                      <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-                        <span className="text-slate-400 block text-[11px]">{t.doctor.emergencyLabel}</span>
-                        <span className="font-semibold text-red-400 mt-0.5 block">{t.doctor.emergencyVal}</span>
+                      <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                        <span className="text-slate-500 block text-[11px] font-medium">{t.doctor.emergencyLabel}</span>
+                        <span className="font-bold text-red-700 mt-0.5 block">{t.doctor.emergencyVal}</span>
                       </div>
                     </div>
 
-                    <div className="p-3 rounded-xl bg-red-950/30 border border-red-800/40 text-xs text-red-300 flex items-start gap-2">
+                    <div className="p-3.5 rounded-2xl bg-red-50 border border-red-200 text-xs text-red-800 flex items-start gap-2">
                       <span>⚠️</span>
                       <span><strong>{t.doctor.cautionLabel}</strong> {currentDisease.caution[lang] || currentDisease.caution.en}</span>
                     </div>
@@ -1166,15 +1164,15 @@
               <div className="space-y-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div>
-                    <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                    <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
                       <span>📈 {t.mandi.title}</span>
                     </h2>
-                    <p className="text-xs text-slate-400 mt-1">
+                    <p className="text-xs text-slate-600 mt-1">
                       {t.mandi.desc}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-xl text-slate-300 font-mono">
+                    <span className="text-xs bg-white border border-slate-300 px-3 py-1.5 rounded-xl text-slate-700 font-bold font-mono shadow-xs">
                       {t.mandi.updatedAt}
                     </span>
                   </div>
@@ -1182,27 +1180,27 @@
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {MULTI_MANDI.map((item, i) => (
-                    <div key={i} className="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl space-y-3 hover:border-slate-700 transition">
+                    <div key={i} className="bg-white border border-slate-200 p-5 rounded-3xl space-y-3 hover:border-emerald-300 hover:shadow-md transition shadow-sm">
                       <div className="flex items-start justify-between">
                         <div>
-                          <span className="text-xs text-slate-400 block">{item.markets[lang] || item.markets.en}</span>
-                          <h3 className="font-bold text-base text-white mt-0.5">{item.crops[lang] || item.crops.en}</h3>
+                          <span className="text-xs text-slate-500 block font-medium">{item.markets[lang] || item.markets.en}</span>
+                          <h3 className="font-extrabold text-base text-slate-900 mt-0.5">{item.crops[lang] || item.crops.en}</h3>
                         </div>
-                        <span className={`text-xs px-2 py-0.5 rounded-full font-bold flex items-center gap-0.5 ${
-                          item.status === 'up' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-red-950 text-red-400 border border-red-800'
+                        <span className={`text-xs px-2.5 py-0.5 rounded-full font-bold flex items-center gap-0.5 ${
+                          item.status === 'up' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-red-100 text-red-800 border border-red-300'
                         }`}>
                           {item.status === 'up' ? '▲' : '▼'} {item.change}
                         </span>
                       </div>
 
-                      <div className="pt-2 border-t border-slate-800/80">
-                        <span className="text-2xl font-extrabold text-white">₹{item.price.toLocaleString()}</span>
-                        <span className="text-xs text-slate-400 ml-1">{t.mandi.perQuintal}</span>
+                      <div className="pt-2 border-t border-slate-100">
+                        <span className="text-2xl font-extrabold text-slate-900">₹{item.price.toLocaleString()}</span>
+                        <span className="text-xs text-slate-500 font-medium ml-1">{t.mandi.perQuintal}</span>
                       </div>
 
-                      <div className="text-[11px] text-slate-400 flex items-center justify-between pt-1">
+                      <div className="text-[11px] text-slate-500 flex items-center justify-between pt-1 font-medium">
                         <span>{t.mandi.modalPrice}</span>
-                        <button onClick={() => alert('Mandi trends modal')} className="text-emerald-400 hover:underline">
+                        <button onClick={() => alert('Mandi trends modal')} className="text-emerald-700 font-bold hover:underline">
                           {t.mandi.detailsChart}
                         </button>
                       </div>
@@ -1210,12 +1208,12 @@
                   ))}
                 </div>
 
-                <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="bg-white border border-slate-200 rounded-3xl p-6 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
                   <div className="space-y-1">
-                    <h3 className="font-bold text-sm text-white">{t.mandi.alertCardTitle}</h3>
-                    <p className="text-xs text-slate-400">{t.mandi.alertCardDesc}</p>
+                    <h3 className="font-extrabold text-sm text-slate-900">{t.mandi.alertCardTitle}</h3>
+                    <p className="text-xs text-slate-600">{t.mandi.alertCardDesc}</p>
                   </div>
-                  <button onClick={() => alert('WhatsApp price alert enabled')} className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-5 py-2.5 rounded-xl transition">
+                  <button onClick={() => alert('WhatsApp price alert enabled')} className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-sm shadow-emerald-600/30">
                     {t.mandi.alertCardBtn}
                   </button>
                 </div>
@@ -1226,25 +1224,25 @@
             {activeTab === 'calculator' && (
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                  <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
                     <span>🧪 {t.calculator.title}</span>
                   </h2>
-                  <p className="text-xs text-slate-400 mt-1">
+                  <p className="text-xs text-slate-600 mt-1">
                     {t.calculator.desc}
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   {/* Input Form */}
-                  <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4">
-                    <h3 className="font-semibold text-sm text-white">{t.calculator.paramsTitle}</h3>
+                  <div className="bg-white border border-slate-200 rounded-3xl p-6 space-y-4 shadow-sm">
+                    <h3 className="font-bold text-sm text-slate-900">{t.calculator.paramsTitle}</h3>
 
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t.calculator.cropType}</label>
+                      <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.calculator.cropType}</label>
                       <select
                         value={calcCrop}
                         onChange={e => setCalcCrop(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+                        className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:border-emerald-600"
                       >
                         <option value="paddy">Paddy (Tricyclazole / Chlorpyrifos)</option>
                         <option value="cotton">Cotton (Emamectin / Imidacloprid)</option>
@@ -1254,23 +1252,23 @@
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t.calculator.landArea}</label>
+                      <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.calculator.landArea}</label>
                       <input
                         type="number"
                         min="0.5"
                         step="0.5"
                         value={calcArea}
                         onChange={e => setCalcArea(parseFloat(e.target.value) || 1)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 font-mono"
+                        className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:border-emerald-600 font-mono font-bold"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t.calculator.tankSize}</label>
+                      <label className="block text-xs font-bold text-slate-700 mb-1.5">{t.calculator.tankSize}</label>
                       <select
                         value={calcTank}
                         onChange={e => setCalcTank(parseInt(e.target.value))}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+                        className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:border-emerald-600"
                       >
                         <option value="16">16 L (Knapsack manual sprayer)</option>
                         <option value="20">20 L (Battery operated knapsack)</option>
@@ -1280,46 +1278,46 @@
                   </div>
 
                   {/* Calculated Output Card */}
-                  <div className="lg:col-span-2 bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-6">
-                    <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+                  <div className="lg:col-span-2 bg-white border border-slate-200 rounded-3xl p-6 space-y-6 shadow-sm">
+                    <div className="flex items-center justify-between pb-4 border-b border-slate-200">
                       <div>
-                        <span className="text-xs text-emerald-400 font-semibold uppercase tracking-wider">{t.calculator.resultHeader}</span>
-                        <h3 className="text-base font-bold text-white mt-0.5">{t.calculator.forYourLand} ({calcArea} Acres)</h3>
+                        <span className="text-xs text-emerald-700 font-bold uppercase tracking-wider">{t.calculator.resultHeader}</span>
+                        <h3 className="text-base font-extrabold text-slate-900 mt-0.5">{t.calculator.forYourLand} ({calcArea} Acres)</h3>
                       </div>
-                      <span className="text-xs bg-emerald-950 text-emerald-400 border border-emerald-800 px-3 py-1 rounded-full font-bold">
+                      <span className="text-xs bg-emerald-100 text-emerald-800 border border-emerald-300 px-3 py-1 rounded-full font-bold">
                         {t.calculator.antiOverdose}
                       </span>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-                        <span className="text-xs text-slate-400">{t.calculator.perTankDose}</span>
-                        <span className="text-xl font-extrabold text-emerald-400 font-mono block">
+                      <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+                        <span className="text-xs text-slate-500 font-medium">{t.calculator.perTankDose}</span>
+                        <span className="text-2xl font-extrabold text-emerald-700 font-mono block">
                           {(calcTank * 2.0).toFixed(0)} g/ml
                         </span>
                         <span className="text-[11px] text-slate-500">Per {calcTank} L water</span>
                       </div>
 
-                      <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-                        <span className="text-xs text-slate-400">{t.calculator.waterTotal}</span>
-                        <span className="text-xl font-extrabold text-blue-400 font-mono block">
+                      <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+                        <span className="text-xs text-slate-500 font-medium">{t.calculator.waterTotal}</span>
+                        <span className="text-2xl font-extrabold text-blue-700 font-mono block">
                           {(calcArea * 200).toFixed(0)} L
                         </span>
                         <span className="text-[11px] text-slate-500">{Math.ceil((calcArea * 200) / calcTank)} Tanks Total</span>
                       </div>
 
-                      <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-                        <span className="text-xs text-slate-400">{t.calculator.chemTotal}</span>
-                        <span className="text-xl font-extrabold text-amber-400 font-mono block">
+                      <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+                        <span className="text-xs text-slate-500 font-medium">{t.calculator.chemTotal}</span>
+                        <span className="text-2xl font-extrabold text-amber-700 font-mono block">
                           {(calcArea * 400).toFixed(0)} g/ml
                         </span>
                         <span className="text-[11px] text-slate-500">For {calcArea} Acres</span>
                       </div>
                     </div>
 
-                    <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 space-y-2">
-                      <h4 className="font-semibold text-xs text-slate-200">{t.calculator.goldenRules}</h4>
-                      <ul className="text-xs text-slate-400 space-y-1 list-disc list-inside">
+                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                      <h4 className="font-bold text-xs text-slate-800">{t.calculator.goldenRules}</h4>
+                      <ul className="text-xs text-slate-600 space-y-1 list-disc list-inside">
                         <li>{t.calculator.rule1}</li>
                         <li>{t.calculator.rule2}</li>
                         <li>{t.calculator.rule3}</li>
@@ -1334,29 +1332,29 @@
             {activeTab === 'schemes' && (
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                  <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
                     <span>🏛️ {t.schemes.title}</span>
                   </h2>
-                  <p className="text-xs text-slate-400 mt-1">
+                  <p className="text-xs text-slate-600 mt-1">
                     {t.schemes.desc}
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {MULTI_SCHEMES.map((s, idx) => (
-                    <div key={idx} className="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl flex flex-col justify-between space-y-4">
+                    <div key={idx} className="bg-white border border-slate-200 p-6 rounded-3xl flex flex-col justify-between space-y-4 shadow-sm hover:border-emerald-300 transition">
                       <div className="space-y-2.5">
-                        <span className="text-[11px] font-mono text-emerald-400 uppercase tracking-wider">{s.dept}</span>
-                        <h3 className="font-bold text-base text-white">{s.names[lang] || s.names.en}</h3>
-                        <div className="text-xs space-y-1.5 text-slate-300">
-                          <div><strong className="text-slate-400">{t.schemes.benefitLabel}</strong> {s.benefits[lang] || s.benefits.en}</div>
-                          <div><strong className="text-slate-400">{t.schemes.eligibilityLabel}</strong> {s.eligibility[lang] || s.eligibility.en}</div>
+                        <span className="text-[11px] font-mono font-bold text-emerald-700 uppercase tracking-wider">{s.dept}</span>
+                        <h3 className="font-extrabold text-base text-slate-900">{s.names[lang] || s.names.en}</h3>
+                        <div className="text-xs space-y-1.5 text-slate-700">
+                          <div><strong className="text-slate-900 font-bold">{t.schemes.benefitLabel}</strong> {s.benefits[lang] || s.benefits.en}</div>
+                          <div><strong className="text-slate-900 font-bold">{t.schemes.eligibilityLabel}</strong> {s.eligibility[lang] || s.eligibility.en}</div>
                         </div>
                       </div>
 
                       <button
                         onClick={() => alert((s.names[lang] || s.names.en) + ' application modal')}
-                        className="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs py-2.5 rounded-xl transition border border-slate-700/60"
+                        className="w-full bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-800 font-bold text-xs py-2.5 rounded-xl transition border border-slate-200"
                       >
                         {s.action[lang] || s.action.en}
                       </button>
@@ -1369,18 +1367,18 @@
           </main>
 
           {/* Footer */}
-          <footer className="mt-12 border-t border-slate-800/80 bg-slate-950 py-8 px-4 text-center text-xs text-slate-500">
+          <footer className="mt-12 border-t border-slate-200 bg-white py-8 px-4 text-center text-xs text-slate-500">
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-2">
-                <span className="text-emerald-400 font-bold text-sm">KissanAI</span>
+                <span className="text-emerald-700 font-bold text-sm">KissanAI</span>
                 <span>•</span>
                 <span>Dhenu Agricultural Foundation Model Architecture</span>
               </div>
               <p>{t.footer.copyright}</p>
               <div className="flex gap-4">
-                <a href="https://github.com/guptavedansh665-glitch/Hackday-Hactober" target="_blank" className="hover:text-emerald-400">GitHub</a>
-                <a href="#" className="hover:text-emerald-400">{t.footer.privacy}</a>
-                <a href="#" className="hover:text-emerald-400">{t.footer.terms}</a>
+                <a href="https://github.com/guptavedansh665-glitch/Hackday-Hactober" target="_blank" className="hover:text-emerald-700 font-medium">GitHub</a>
+                <a href="#" className="hover:text-emerald-700 font-medium">{t.footer.privacy}</a>
+                <a href="#" className="hover:text-emerald-700 font-medium">{t.footer.terms}</a>
               </div>
             </div>
           </footer>
