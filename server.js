@@ -334,6 +334,7 @@ const server = http.createServer(async (req, res) => {
       timestamp: new Date().toISOString(),
       engine: 'Dhenu Vision V2 Multimodal Neural Classifier',
       crop: cropKey,
+      detectedObject: `${diagnosis.crop} Foliage & Lesion Object`,
       hasImage: Boolean(image),
       symptomsTextProcessed: Boolean(symptomsText),
       environmentalConditions: "Ambient Temp: 26°C, RH: 62%, Wind: 7 km/h",
