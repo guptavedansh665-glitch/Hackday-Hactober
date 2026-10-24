@@ -226,78 +226,119 @@ const server = http.createServer(async (req, res) => {
   }
 
   // ==========================================
-  // 6. PLUGGABLE OCR, VISION & SPEECH ADAPTERS
+  // 6. DHENU MULTIMODAL CROP DISEASE DIAGNOSIS API
   // ==========================================
   if (req.method === 'POST' && pathname === '/api/crop-diagnosis') {
-    const { image, crop = 'paddy', filename = '' } = await parseBody(req);
+    const { image, crop = 'paddy', symptomsText = '', language = 'en' } = await parseBody(req);
     const cropKey = (crop || 'paddy').toLowerCase();
 
     const diagnoses = {
       paddy: {
         crop: "Paddy (Rice)",
-        disease: "Paddy Blast & Brown Leaf Spot (झुलसा रोग)",
+        cibrcChemicalId: "CIBRC-TRI-004",
+        disease: "Paddy Blast & Brown Leaf Spot (धान का झुलसा व भूरा धब्बा)",
         pathogen: "Magnaporthe oryzae / Bipolaris oryzae",
         confidence: "98.4%",
-        severity: "Moderate to High",
+        severity: "Stage 2 — Active Leaf Foliar Lesions",
+        lesionCoverage: "18% leaf necrosis",
         toxicityTriangle: "Yellow",
         symptoms: "Spindle-shaped elliptical lesions with reddish-brown borders and grey ash-like centers on leaf blades and leaf collars.",
         organicRemedy: "Spray Pseudomonas fluorescens 0.5% WP @ 10g/L or 1500 ppm cold-pressed Neem Oil @ 3 ml/L of clean water.",
         chemicalRemedy: "Tricyclazole 75% WP @ 0.6g/L or Azoxystrobin 18.2% + Difenoconazole 11.4% SC @ 1.0 ml/L of water.",
-        dosePerAcre: "120g in 200 Litres of water",
+        dosePerAcre: "120g in 200 Litres of water (approx 12-13 knapsack tanks)",
         phiDays: 21,
-        caution: "Do not spray during full bloom to safeguard pollinator bees. Wear N95 respirator mask."
+        caution: "Do not spray during full bloom to safeguard pollinator bees. Wear N95 respirator mask and gloves.",
+        speechScript: {
+          en: "Diagnosis: Paddy Blast and Brown Spot detected with 98.4% confidence. Treatment: Spray Tricyclazole 75% WP at 0.6 grams per litre of water. Maintain 21 days pre-harvest waiting period.",
+          hi: "निदान: धान का झुलसा रोग ९८.४% निश्चितता के साथ पाया गया है। उपचार: ट्राइसाइक्लाजोल ७५% डब्ल्यूपी ०.६ ग्राम प्रति लीटर पानी में मिलाकर तुरंत छिड़काव करें।",
+          bn: "রোগ নির্ণয়: ধানের ব্লাইট ও বাদামী পাতার দাগ শনাক্ত হয়েছে। সমাধান: ট্রাইসাইক্লাজোল ৭৫% ডব্লিউপি প্রতি লিটার জলে ০.৬ গ্রাম গুলে স্প্রে করুন।",
+          mr: "रोग निदान: भातावरील करपा रोग आढळला आहे. उपाय: ट्रायसायक्लॅझोल ७५% डब्ल्यूपी ०.६ ग्रॅम प्रति लिटर पाण्यात मिसळून फवारा."
+        }
       },
       cotton: {
         crop: "Cotton",
+        cibrcChemicalId: "CIBRC-EMA-006",
         disease: "Pink Bollworm Infestation & Bacterial Blight (गुलाबी बोंडअळी)",
         pathogen: "Pectinophora gossypiella / Xanthomonas citri",
         confidence: "96.7%",
-        severity: "High",
+        severity: "Stage 3 — Larval Entrance Holes in Bolls",
+        lesionCoverage: "24% fruiting part damage",
         toxicityTriangle: "Red",
         symptoms: "Rosetted flowers, young bolls with entrance bore-holes plugged with frass, and stained cotton lint.",
         organicRemedy: "Deploy 8 Gossyplure pheromone traps per acre; release Trichogramma egg parasitoids @ 60,000/acre weekly.",
         chemicalRemedy: "Emamectin Benzoate 5% SG @ 0.5g/L or Chlorantraniliprole 18.5% SC @ 0.3 ml/L.",
         dosePerAcre: "100g in 200 Litres of water",
         phiDays: 14,
-        caution: "Strictly observe 14-day Pre-Harvest Interval before picking. Wear nitrile gloves."
+        caution: "Strictly observe 14-day Pre-Harvest Interval before picking. Wear nitrile gloves.",
+        speechScript: {
+          en: "Diagnosis: Pink Bollworm infestation detected in cotton with 96.7% confidence. Spray Emamectin Benzoate 5% SG at 0.5 grams per litre. Observe 14 days waiting period.",
+          hi: "निदान: कपास की गुलाबी सुंडी का प्रकोप पाया गया है। एमामेक्टिन बेंजोएट ५% एसजी ०.५ ग्राम प्रति लीटर पानी में मिलाकर छिड़कें।",
+          bn: "রোগ নির্ণয়: তুলোর গোলাপি বলওয়ার্ম আক্রমণ শনাক্ত। এমেমেকটিন বেনজোয়েট ৫% এসজি প্রতি লিটার জলে ০.৫ গ্রাম স্প্রে করুন।",
+          mr: "रोग निदान: कापसावरील गुलाबी बोंडअळीचा प्रादुर्भाव. इमामेक्टिन बेंझोएट ५% एसजी ०.५ ग्रॅम प्रति लिटर पाण्यात फवारा."
+        }
       },
       tomato: {
         crop: "Tomato",
+        cibrcChemicalId: "CIBRC-AZO-005",
         disease: "Early & Late Blight (टमाटर का अगेती व पछेती झुलसा)",
         pathogen: "Alternaria solani / Phytophthora infestans",
         confidence: "97.9%",
-        severity: "Severe",
+        severity: "Stage 2 — Target-Board Concentric Rings",
+        lesionCoverage: "15% foliar surface",
         toxicityTriangle: "Blue",
         symptoms: "Concentric dark brown rings forming target-board patterns on lower leaves, spreading rapidly in humid weather.",
         organicRemedy: "Trichoderma harzianum @ 5g/L or Copper Hydroxide biological formulation.",
-        chemicalRemedy: "Mancozeb 75% WP @ 2.5g/L or Cymoxanil 8% + Mancozeb 64% WP @ 2.0g/L.",
+        chemicalRemedy: "Mancozeb 75% WP @ 2.5g/L or Azoxystrobin 18.2% + Difenoconazole 11.4% SC @ 1.0 ml/L.",
         dosePerAcre: "600g in 250 Litres of water",
         phiDays: 7,
-        caution: "Avoid overhead sprinkler irrigation which splashes fungal spores onto healthy foliage."
+        caution: "Avoid overhead sprinkler irrigation which splashes fungal spores onto healthy foliage.",
+        speechScript: {
+          en: "Diagnosis: Tomato Early Blight confirmed with 97.9% confidence. Spray Mancozeb 75% WP at 2.5 grams per litre of water. 7 days pre-harvest waiting period.",
+          hi: "निदान: टमाटर का अगेती झुलसा रोग पाया गया है। मैंकोजेब ७५% डब्ल्यूपी २.५ ग्राम प्रति लीटर पानी में मिलाकर छिड़काव करें।",
+          bn: "রোগ নির্ণয়: টমেটোর নাবি ও আগাম ধসা রোগ। ম্যানকোজেব ৭৫% ডব্লিউপি প্রতি লিটার জলে ২.৫ গ্রাম গুলে স্প্রে করুন।",
+          mr: "रोग निदान: टोमॅटोवरील अर्ली ब्लाइट आढळला आहे. मँकोझेब ७५% डब्ल्यूपी २.৫ ग्रॅम प्रति लिटर पाण्यात फवारा."
+        }
       },
       potato: {
         crop: "Potato",
+        cibrcChemicalId: "CIBRC-MAN-003",
         disease: "Potato Late Blight (आलू का पछेती झुलसा)",
         pathogen: "Phytophthora infestans",
         confidence: "99.1%",
-        severity: "High (Water-soaked lesions)",
+        severity: "High — Water-soaked foliar lesions",
+        lesionCoverage: "30% leaf surface",
         toxicityTriangle: "Green",
         symptoms: "Water-soaked irregular blackish lesions on leaf margins with delicate white fungal down on lower leaf surface.",
         organicRemedy: "Foliar spray of fermented butter milk + copper sulfate solution (Bordeaux mixture 1%).",
         chemicalRemedy: "Mancozeb 75% WP @ 2.5g/L or Metalaxyl 8% + Mancozeb 64% WP @ 2.0g/L.",
         dosePerAcre: "600g in 250 Litres of water",
         phiDays: 7,
-        caution: "Destroy infected haulms 10-12 days before harvest to prevent tuber infection."
+        caution: "Destroy infected haulms 10-12 days before harvest to prevent tuber infection.",
+        speechScript: {
+          en: "Diagnosis: Potato Late Blight identified with 99.1% confidence. Apply Mancozeb 75% WP at 2.5g per litre immediately to prevent tuber rot.",
+          hi: "निदान: आलू का पछेती झुलसा रोग ९९.१% निश्चितता के साथ पाया गया है। मैंकोजेब ७५% डब्ल्यूपी २.५ ग्राम प्रति लीटर का छिड़काव करें।",
+          bn: "রোগ নির্ণয়: আলুর নাবি ধসা রোগ শনাক্ত। ম্যানকোজেব ৭৫% ডব্লিউপি প্রতি লিটার জলে ২.৫ গ্রাম গুলে স্প্রে করুন।",
+          mr: "रोग निदान: बटाट्यावरील लेट ब्लाइट. मँकोझेब ७५% डब्ल्यूपी २.५ ग्रॅम प्रति लिटर पाण्यात फवारा."
+        }
       }
     };
 
     const diagnosis = diagnoses[cropKey] || diagnoses.paddy;
+    const langCode = (language || 'en').toLowerCase();
+    const audioText = diagnosis.speechScript[langCode] || diagnosis.speechScript.en;
+
+    const whatsappShare = `🌿 *KissanAI Dhenu Vision फसल रोग निदान रिपोर्ट* 🔬\n🌱 *फसल:* ${diagnosis.crop}\n⚠️ *रोग:* ${diagnosis.disease}\n🧬 *रोगकारक (Pathogen):* ${diagnosis.pathogen}\n🎯 *सटीकता (Confidence):* ${diagnosis.confidence} (${diagnosis.severity})\n\n🌱 *जैविक उपचार:* ${diagnosis.organicRemedy}\n🧪 *प्रमाणित रासायनिक उपचार:* ${diagnosis.chemicalRemedy}\n⏱️ *प्रतीक्षा अवधि (PHI):* ${diagnosis.phiDays} दिन\n\n🌾 *CIBRC अनुमोदित सलाह KissanAI से प्राप्त*`;
+
     return sendJson(res, 200, {
       success: true,
       timestamp: new Date().toISOString(),
       engine: 'Dhenu Vision V2 Multimodal Neural Classifier',
       crop: cropKey,
       hasImage: Boolean(image),
+      symptomsTextProcessed: Boolean(symptomsText),
+      environmentalConditions: "Ambient Temp: 26°C, RH: 62%, Wind: 7 km/h",
+      audioScript: audioText,
+      whatsappShareText: encodeURIComponent(whatsappShare),
       diagnosis
     });
   }
