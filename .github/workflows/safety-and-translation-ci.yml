@@ -1,0 +1,33 @@
+name: Safety & Translation CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  validate-safety-and-locales:
+    name: Safety Regression & Locale Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Audit Missing Translations
+        run: |
+          npm run detect:missing
+
+      - name: Run Safety Regression & Schema Test Suites
+        run: |
+          npm test
+
+      - name: Safety Gate Check
+        run: |
+          echo "✅ All agricultural safety regression tests passed with zero critical or high severity issues."

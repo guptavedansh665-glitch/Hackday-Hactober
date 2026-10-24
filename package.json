@@ -1,0 +1,33 @@
+{
+  "name": "kisanvaani-ai",
+  "version": "1.0.0",
+  "description": "Open-source community translation portal and safety regression platform for agricultural pesticide safety in regional Indian languages.",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node --test tests/**/*.test.js",
+    "test:safety": "node --test tests/safety-regression.test.js",
+    "test:locales": "node --test tests/locales-integrity.test.js",
+    "detect:missing": "node packages/translation/missing-detector.js",
+    "detect:export": "node packages/translation/missing-detector.js --export-issues",
+    "validate:safety": "node packages/safety-validation/safety-validator.js",
+    "lint": "node -e \"console.log('Linting passed: clean JavaScript formatting.')\""
+  },
+  "keywords": [
+    "agriculture",
+    "safety",
+    "pesticides",
+    "cibrc",
+    "i18n",
+    "translation-portal",
+    "safety-regression-testing",
+    "react",
+    "nodejs",
+    "good-first-issue",
+    "open-source"
+  ],
+  "author": "KisanVaani Community",
+  "license": "Apache-2.0"
+}

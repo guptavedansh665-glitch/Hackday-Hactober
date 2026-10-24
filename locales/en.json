@@ -1,0 +1,55 @@
+{
+  "meta": {
+    "language_code": "en",
+    "language_name": "English",
+    "version": "1.0.0",
+    "last_verified": "2026-10-24"
+  },
+  "ui": {
+    "app_title": "KisanVaani AI - Agricultural Safety Assistant",
+    "scan_label_btn": "Scan Pesticide Label",
+    "listen_instructions_btn": "Listen to Voice Instructions",
+    "select_language": "Select your language",
+    "safety_disclaimer": "Always follow Central Insecticides Board (CIBRC) approved safety guidelines before spraying.",
+    "emergency_call_btn": "Emergency Poison Helpline",
+    "verified_by_expert": "Verified by Agricultural Scientist",
+    "community_contribute_hint": "Notice an error or want to improve this translation? Click here to contribute."
+  },
+  "safety_levels": {
+    "danger_poison": "DANGER - EXTREMELY TOXIC (Red Triangle)",
+    "warning_poison": "WARNING - HIGHLY TOXIC (Yellow Triangle)",
+    "caution_danger": "CAUTION - MODERATELY TOXIC (Blue Triangle)",
+    "caution": "CAUTION - SLIGHTLY TOXIC (Green Triangle)"
+  },
+  "ppe_requirements": {
+    "gloves": "Wear nitrile chemical-resistant gloves during mixing and spraying.",
+    "mask": "Wear certified N95 or particulate respirator mask to prevent inhalation.",
+    "eye_protection": "Wear protective eye goggles to avoid splashes.",
+    "boots": "Wear rubber gumboots; do not spray barefoot or in sandals.",
+    "clothing": "Wear long-sleeved shirt and full-length trousers."
+  },
+  "dosage_and_mixing": {
+    "dosage_instruction": "Mix exactly {dose_amount} per {water_volume} of clean water.",
+    "acreage_guideline": "Recommended spray volume is {spray_volume} per acre.",
+    "tank_calibration": "Calibrate knapsack sprayer nozzle before use to ensure uniform spray pattern.",
+    "no_overdose_warning": "CRITICAL: Do not exceed recommended dosage. Overdosing causes crop phytotoxicity and chemical resistance."
+  },
+  "application_timing": {
+    "weather_conditions": "Do not spray during strong winds (>15 km/h) or immediately before rainfall.",
+    "spray_hours": "Apply during early morning (6:00 AM - 9:00 AM) or late afternoon (4:30 PM - 6:30 PM) to protect pollinator bees.",
+    "pre_harvest_interval": "Waiting Period (Pre-Harvest Interval): Do not harvest crops for at least {phi_days} days after application."
+  },
+  "emergency_and_first_aid": {
+    "skin_contact": "In case of skin contact, immediately wash affected area with plenty of clean water and soap for at least 15 minutes.",
+    "eye_contact": "In case of eye splash, rinse eyes gently with clean running water for 15 minutes holding eyelids open. Seek medical attention.",
+    "inhalation": "If vapors are inhaled, immediately move patient to fresh air. Loosen tight collar and belts.",
+    "swallowing_warning": "If swallowed, do NOT induce vomiting unless instructed by a qualified medical doctor.",
+    "antidote_header": "Specific Antidote:",
+    "antidote_atropine": "Administer Atropine sulphate (2 to 4 mg intravenously) under qualified medical supervision until atropinization symptoms appear.",
+    "antidote_none": "No specific antidote known. Treat symptomatically and supportively."
+  },
+  "storage_and_disposal": {
+    "storage_condition": "Store in original sealed container in a locked room away from food, animal feed, and children.",
+    "empty_container_disposal": "Triple rinse empty container, puncture bottom to prevent reuse, and bury safely away from water bodies."
+  }
+}
