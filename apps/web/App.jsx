@@ -1155,6 +1155,13 @@ function App() {
   const [voiceText, setVoiceText] = useState('');
   const [selectedCropKey, setSelectedCropKey] = useState('paddy');
 
+  // Speech Recognition & Text-to-Speech State
+  const recognitionRef = useRef(null);
+  const [speechInterim, setSpeechInterim] = useState('');
+  const [speechError, setSpeechError] = useState('');
+  const [playingMessageId, setPlayingMessageId] = useState(null);
+  const [isSpeechSupported, setIsSpeechSupported] = useState(true);
+
   // Live Camera & Photo Diagnosis State
   const videoRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -1747,6 +1754,20 @@ function App() {
     };
   }, []);
 
+  // Web Speech Recognition & Speech Synthesis Lifecycle Handler
+  useEffect(() => {
+    const hasSpeech = typeof window !== 'undefined' && Boolean(window.SpeechRecognition || window.webkitSpeechRecognition);
+    setIsSpeechSupported(hasSpeech);
+    return () => {
+      if (recognitionRef.current) {
+        try { recognitionRef.current.abort(); } catch (e) {}
+      }
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        try { window.speechSynthesis.cancel(); } catch (e) {}
+      }
+    };
+  }, []);
+
   const t = I18N[lang] || I18N.en;
   const currentDisease = MULTI_DISEASES[selectedCropKey] || MULTI_DISEASES.paddy;
 
@@ -2026,9 +2047,69 @@ function App() {
     }
   };
 
-  const toggleVoice = () => {
-    if (!isListening) {
-      setIsListening(true);
+  // Synthesize Text-to-Speech audio for Dhenu AI responses
+  const speakMessage = (msgId, text) => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+      alert('Speech synthesis audio is not supported in this browser.');
+      return;
+    }
+
+    if (playingMessageId === msgId) {
+      window.speechSynthesis.cancel();
+      setPlayingMessageId(null);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    // Clean text: strip markdown formatting and bullet icons for clear natural speech
+    const cleanText = text
+      .replace(/[#*`_~]/g, '')
+      .replace(/[🌾🌤️🎙️🛑⚠️✅●💡]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    const langMap = { hi: 'hi-IN', bn: 'bn-IN', mr: 'mr-IN', en: 'en-IN' };
+    utterance.lang = langMap[lang] || 'en-IN';
+    utterance.rate = 0.95;
+
+    utterance.onstart = () => setPlayingMessageId(msgId);
+    utterance.onend = () => setPlayingMessageId(null);
+    utterance.onerror = () => setPlayingMessageId(null);
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const stopVoice = () => {
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch (e) {}
+    }
+    setIsListening(false);
+  };
+
+  const startVoice = () => {
+    setSpeechError('');
+    setSpeechInterim('');
+
+    const SpeechRecognition = typeof window !== 'undefined'
+      ? (window.SpeechRecognition || window.webkitSpeechRecognition)
+      : null;
+
+    if (!SpeechRecognition) {
+      setSpeechError(
+        lang === 'bn'
+          ? "আপনার ব্রাউজারে লাইভ স্পিচ রিকগনিশন উপলব্ধ নয়। Google Chrome, Edge বা Safari ব্যবহার করুন।"
+          : (lang === 'hi'
+              ? "आपके ब्राउज़र में लाइव स्पीच उपलब्ध नहीं है। कृपया Google Chrome, Edge या Safari का उपयोग करें।"
+              : (lang === 'mr'
+                  ? "तुमच्या ब्राऊझरमध्ये लाइव्ह व्हॉइस सपोर्ट नाही. कृपया Chrome किंवा Safari वापरा."
+                  : "Live speech recognition is not supported in this browser. Please use Chrome, Edge, or Safari."))
+      );
+
+      // Interactive Regional Demo Voice Query Fallback
       const sampleQueries = {
         bn: "ধানের পাতায় বাদামী দাগ ও ধসা রোগ হয়েছে, কী স্প্রে করব?",
         hi: "धान के खेत में झुलसा रोग लगा है, क्या छिड़काव करें?",
@@ -2036,29 +2117,137 @@ function App() {
         en: "What should I spray for paddy blast and brown leaf spot?"
       };
       const prompt = sampleQueries[lang] || sampleQueries.en;
-
+      setIsListening(true);
       setTimeout(() => {
         setVoiceText(prompt);
         setIsListening(false);
-        handleSendQuery(prompt);
-      }, 2200);
-    } else {
+        handleSendQuery(prompt, true);
+      }, 2000);
+      return;
+    }
+
+    try {
+      if (recognitionRef.current) {
+        try { recognitionRef.current.abort(); } catch (e) {}
+      }
+
+      const recognition = new SpeechRecognition();
+      recognitionRef.current = recognition;
+
+      const langMap = { hi: 'hi-IN', bn: 'bn-IN', mr: 'mr-IN', en: 'en-IN' };
+      recognition.lang = langMap[lang] || 'en-IN';
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 1;
+
+      let capturedFinalText = '';
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        setSpeechError('');
+        setSpeechInterim('');
+      };
+
+      recognition.onresult = (event) => {
+        let interim = '';
+        let final = '';
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          const item = event.results[i];
+          if (item.isFinal) {
+            final += item[0].transcript;
+          } else {
+            interim += item[0].transcript;
+          }
+        }
+
+        if (final) {
+          capturedFinalText = final;
+          setVoiceText(final);
+          setSpeechInterim('');
+        } else if (interim) {
+          setSpeechInterim(interim);
+          setVoiceText(interim);
+        }
+      };
+
+      recognition.onerror = (event) => {
+        console.warn('[KissanAI Speech Recognition Notice]', event.error);
+        setIsListening(false);
+        if (event.error === 'no-speech') {
+          setSpeechError(
+            lang === 'bn'
+              ? "কোনো শব্দ শোনা যায়নি। দয়া করে মাইকে স্পষ্ট করে বলুন।"
+              : (lang === 'hi'
+                  ? "कोई आवाज़ नहीं सुनाई दी। कृपया माइक के पास साफ़ बोलें।"
+                  : (lang === 'mr'
+                      ? "आवाज ऐकू आला नाही. कृपया माइक जवळ स्पष्ट बोला."
+                      : "No speech detected. Please tap mic and speak clearly."))
+          );
+        } else if (event.error === 'not-allowed') {
+          setSpeechError(
+            lang === 'bn'
+              ? "মাইক্রোফোন অনুমতি মেলেনি। দয়া করে ব্রাউজারে অনুমতি প্রদান করুন।"
+              : (lang === 'hi'
+                  ? "माइक्रोफ़ोन अनुमति नहीं मिली। कृपया ब्राउज़र सेटिंग्स में जाकर अनुमति दें।"
+                  : (lang === 'mr'
+                      ? "मायक्रोफोन परवानगी नाकारली आहे. कृपया ब्राउझरमध्ये परवानगी सक्षम करा."
+                      : "Microphone permission denied. Please allow microphone access in your browser."))
+          );
+        } else if (event.error !== 'aborted') {
+          setSpeechError(
+            lang === 'bn'
+              ? `ভয়েস সংযোগ ত্রুটি (${event.error})। নিচে লিখেও প্রশ্ন করতে পারেন।`
+              : (lang === 'hi'
+                  ? `आवाज़ पहचान में समस्या (${event.error})। नीचे लिखकर भी पूछ सकते हैं।`
+                  : (lang === 'mr'
+                      ? `व्हॉइस त्रुटी (${event.error})। आपण खाली मजकूर लिहूनही विचारू शकता.`
+                      : `Speech notice (${event.error}). You can also type your question.`))
+          );
+        }
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+        const textToSubmit = capturedFinalText.trim() || voiceText.trim();
+        if (textToSubmit) {
+          handleSendQuery(textToSubmit, true);
+        }
+      };
+
+      recognition.start();
+    } catch (err) {
+      console.error('[KissanAI Speech Activation Error]', err);
       setIsListening(false);
+      setSpeechError(err.message || 'Microphone activation failed');
     }
   };
 
-  const handleSendQuery = async (textToSend) => {
-    const query = textToSend || voiceText;
-    if (!query.trim()) return;
+  const toggleVoice = () => {
+    if (isListening) {
+      stopVoice();
+    } else {
+      startVoice();
+    }
+  };
 
+  const handleSendQuery = async (textToSend, autoSpeak = false) => {
+    const query = (textToSend || voiceText).trim();
+    if (!query) return;
+
+    const userMsgId = 'usr-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
     const userMsg = {
+      id: userMsgId,
       sender: 'user',
       text: query,
       timestamp: lang === 'en' ? 'Now' : (lang === 'bn' ? 'এখন' : 'अभी')
     };
     setChatMessages(prev => [...prev, userMsg]);
     setVoiceText('');
+    setSpeechInterim('');
+    setSpeechError('');
 
+    let aiReply = "";
     try {
       const res = await fetch(`${API_BASE}/api/advisory`, {
         method: 'POST',
@@ -2067,19 +2256,13 @@ function App() {
       });
       const data = await res.json();
       if (data.success && data.reply) {
-        setChatMessages(prev => [...prev, {
-          sender: 'ai',
-          text: data.reply,
-          timestamp: lang === 'en' ? 'Just now' : (lang === 'bn' ? 'এইমাত্র' : 'अभी')
-        }]);
-        return;
+        aiReply = data.reply;
       }
     } catch (err) {}
 
-    setTimeout(() => {
-      let aiReply = "";
+    if (!aiReply) {
       if (lang === 'hi') {
-        aiReply = `🌾 **धान के झुलसा (Blast) रोग का प्रमाणित CIBRC समाधान:**
+        aiReply = `🌾 **धान व फसलों के लिए प्रमाणित CIBRC वैज्ञानिक समाधान:**
 १. **दवा व मात्रा:** ट्राइसाइक्लाजोल ७५% डब्ल्यूपी (Tricyclazole 75% WP) ०.६ ग्राम प्रति लीटर पानी में या एजोक्सीस्ट्रोबिन १८.२% + डाइफेनोकोनाजोल ११.४% एससी १.० मिली/लीटर पानी में मिलाकर छिड़कें।
 २. **छिड़काव का सही समय:** कल सुबह ६:३० से ९:०० बजे के बीच जब हवा की गति < ८ किमी/घंटा हो।
 ३. **प्रतीक्षा अवधि (PHI):** फसल कटाई से कम से कम २१ दिन पहले छिड़काव बंद करें।
@@ -2090,26 +2273,34 @@ function App() {
 २. **फवारणीची योग्य वेळ:** उद्या सकाळी ६:३० ते ९:०० दरम्यान. वाऱ्याचा वेग < ८ किमी/तास असावा.
 ३. **प्रतीक्षा कालावधी (PHI):** कापणीपूर्वी किमान २१ दिवस आधी फवारणी बंद करावी.
 ४. **सुरक्षा सूचना:** फवारणी करताना N95 मास्क व हातमोजे वापरा.`;
-      } else if (lang === 'en') {
-        aiReply = `🌾 **Certified CIBRC Solution for Paddy Blast & Leaf Spot:**
-1. **Chemical Treatment:** Spray Tricyclazole 75% WP @ 0.6g/L OR Azoxystrobin 18.2% + Difenoconazole 11.4% SC @ 1.0 ml/L of clean water.
-2. **Optimal Spray Window:** Tomorrow 6:30 AM - 9:00 AM (Wind speed < 8 km/h).
-3. **Pre-Harvest Interval (PHI):** Maintain at least 21 days waiting period before crop harvest.
-4. **Mandatory PPE:** Wear N95 respirator mask and nitrile chemical-resistant gloves.`;
-      } else {
+      } else if (lang === 'bn') {
         aiReply = `🌾 **ধানের ব্লাইট ও বাদামী পাতার দাগ সমাধান (CIBRC অনুমোদিত):**
 ১. **তাত্ক্ষণিক প্রতিকার:** ট্রাইসাইক্লাজোল ৭৫% ডব্লিউপি প্রতি লিটার জলে ০.৬ গ্রাম অথবা অ্যাজোক্সিস্ট্রোবিন ১৮.২% + ডাইফেনোকোনাজল ১১.৪% এসসি প্রতি লিটার জলে ১.০ মিলি গুলে স্প্রে করুন।
 ২. **স্প্রে করার সময়:** আগামীকাল সকাল ৬:৩০ থেকে ৯:০০ এর মধ্যে যখন বাতাসের গতিবেগ < ৮ কিমি/ঘন্টা।
 ৩. **প্রতীক্ষা সময় (PHI):** ফসল কাটার অন্তত ২১ দিন আগে স্প্রে বন্ধ করুন।
 ৪. **সতর্কতা:** স্প্রে করার সময় মুখে N95 মাস্ক ও নাইট্রাইল গ্লাভস ব্যবহার আবশ্যক।`;
+      } else {
+        aiReply = `🌾 **Certified CIBRC Solution for Paddy Blast & Leaf Spot:**
+1. **Chemical Treatment:** Spray Tricyclazole 75% WP @ 0.6g/L OR Azoxystrobin 18.2% + Difenoconazole 11.4% SC @ 1.0 ml/L of clean water.
+2. **Optimal Spray Window:** Tomorrow 6:30 AM - 9:00 AM (Wind speed < 8 km/h).
+3. **Pre-Harvest Interval (PHI):** Maintain at least 21 days waiting period before crop harvest.
+4. **Mandatory PPE:** Wear N95 respirator mask and nitrile chemical-resistant gloves.`;
       }
+    }
 
-      setChatMessages(prev => [...prev, {
-        sender: 'ai',
-        text: aiReply,
-        timestamp: lang === 'en' ? 'Just now' : (lang === 'bn' ? 'এইমাত্র' : 'अभी')
-      }]);
-    }, 800);
+    const aiMsgId = 'ai-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+    setChatMessages(prev => [...prev, {
+      id: aiMsgId,
+      sender: 'ai',
+      text: aiReply,
+      timestamp: lang === 'en' ? 'Just now' : (lang === 'bn' ? 'এইমাত্র' : 'अभी')
+    }]);
+
+    if (autoSpeak) {
+      setTimeout(() => {
+        speakMessage(aiMsgId, aiReply);
+      }, 350);
+    }
   };
 
   return (
@@ -2393,26 +2584,77 @@ function App() {
                   </p>
                 </div>
 
-                {/* Microphone Trigger */}
+                {/* Microphone Trigger with Live Acoustic Soundwave */}
                 <div className="flex flex-col items-center justify-center gap-3">
                   <div className="relative flex items-center justify-center">
                     {isListening && (
-                      <div className="absolute w-28 h-28 rounded-full bg-emerald-500/25 pulse-ring"></div>
+                      <>
+                        <div className="absolute w-32 h-32 rounded-full bg-red-500/20 pulse-ring"></div>
+                        <div className="absolute w-24 h-24 rounded-full bg-emerald-500/30 pulse-ring" style={{ animationDelay: '0.4s' }}></div>
+                      </>
                     )}
                     <button
+                      type="button"
                       onClick={toggleVoice}
                       className={`w-20 h-20 rounded-full flex items-center justify-center text-3xl shadow-xl transition-all duration-300 ${
                         isListening
-                          ? 'bg-red-500 text-white scale-110 shadow-red-500/30 ring-4 ring-red-400/40'
+                          ? 'bg-red-500 text-white scale-110 shadow-red-500/40 ring-4 ring-red-400/50 animate-pulse'
                           : 'bg-emerald-600 hover:bg-emerald-500 text-white hover:scale-105 shadow-emerald-600/30 ring-4 ring-emerald-100'
                       }`}
+                      title={isListening ? "Stop listening" : "Tap to speak in your language"}
                     >
-                      {isListening ? '🛑' : '🎙️'}
+                      <span>{isListening ? '🛑' : '🎙️'}</span>
                     </button>
                   </div>
-                  <span className="text-xs font-bold text-slate-700">
-                    {isListening ? t.hero.listening : t.hero.tapToSpeak}
-                  </span>
+
+                  {/* Status Label & Equalizer Soundwave */}
+                  <div className="flex flex-col items-center gap-1">
+                    <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                      {isListening ? (
+                        <>
+                          <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                          <span className="text-red-600 font-extrabold">{t.hero.listening}</span>
+                        </>
+                      ) : (
+                        <span>{t.hero.tapToSpeak}</span>
+                      )}
+                    </span>
+
+                    {/* Active Soundwave Equalizer Bars */}
+                    {isListening && (
+                      <div className="flex items-center gap-1 h-6 my-0.5">
+                        <span className="w-1 bg-red-500 rounded-full soundwave-bar"></span>
+                        <span className="w-1 bg-emerald-500 rounded-full soundwave-bar"></span>
+                        <span className="w-1 bg-teal-500 rounded-full soundwave-bar"></span>
+                        <span className="w-1 bg-emerald-600 rounded-full soundwave-bar"></span>
+                        <span className="w-1 bg-red-500 rounded-full soundwave-bar"></span>
+                      </div>
+                    )}
+
+                    {/* Live Interim Speech Transcription Bubble */}
+                    {isListening && speechInterim && (
+                      <div className="max-w-xs px-3 py-1 bg-white/95 border border-emerald-400 rounded-full text-[11px] text-emerald-900 font-medium italic shadow-xs text-center animate-pulse">
+                        “{speechInterim}...”
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Speech Error Banner */}
+                  {speechError && (
+                    <div className="mt-2 p-2.5 max-w-sm rounded-xl bg-red-50 border border-red-300 text-red-800 text-[11px] flex items-center justify-between gap-2 shadow-xs">
+                      <div className="flex items-center gap-1.5">
+                        <span>⚠️</span>
+                        <span>{speechError}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setSpeechError('')}
+                        className="text-red-600 hover:text-red-900 font-bold px-1"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -2517,11 +2759,13 @@ function App() {
                         <span>{msg.timestamp}</span>
                         {msg.sender === 'ai' && (
                           <button
-                            onClick={() => alert('🔊 Audio response playing in ' + lang.toUpperCase())}
-                            className="flex items-center gap-1 font-bold text-emerald-700 hover:text-emerald-800"
+                            type="button"
+                            onClick={() => speakMessage(msg.id || i, msg.text)}
+                            className="flex items-center gap-1.5 font-bold text-emerald-700 hover:text-emerald-900 transition px-2 py-0.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-200"
+                            title="Listen to voice prescription readout"
                           >
-                            <span>🔊</span>
-                            <span>{t.hero.listenAudio}</span>
+                            <span>{playingMessageId === (msg.id || i) ? '⏹️' : '🔊'}</span>
+                            <span>{playingMessageId === (msg.id || i) ? (lang === 'bn' ? 'থামুন' : (lang === 'hi' ? 'रोकें' : (lang === 'mr' ? 'थांबवा' : 'Stop'))) : t.hero.listenAudio}</span>
                           </button>
                         )}
                       </div>
@@ -2530,19 +2774,36 @@ function App() {
                 ))}
               </div>
 
-              {/* Input Box */}
-              <div className="pt-2 flex gap-2">
+              {/* Input Box with Dual Voice / Text Controls */}
+              <div className="pt-2 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={toggleVoice}
+                  className={`p-3 rounded-xl transition flex items-center justify-center text-base shadow-xs shrink-0 ${
+                    isListening
+                      ? 'bg-red-500 text-white animate-pulse ring-2 ring-red-400'
+                      : 'bg-slate-100 hover:bg-emerald-100 text-slate-700 hover:text-emerald-800 border border-slate-300'
+                  }`}
+                  title={isListening ? "Stop listening" : "Tap to speak in your language"}
+                >
+                  <span>{isListening ? '🛑' : '🎙️'}</span>
+                </button>
                 <input
                   type="text"
                   value={voiceText}
                   onChange={e => setVoiceText(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleSendQuery()}
-                  placeholder={t.hero.inputPlaceholder}
-                  className="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                  placeholder={isListening ? (speechInterim ? `"${speechInterim}..."` : t.hero.listening) : t.hero.inputPlaceholder}
+                  className={`flex-1 bg-slate-50 border rounded-xl px-4 py-3 text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none transition ${
+                    isListening
+                      ? 'border-red-400 ring-2 ring-red-200 bg-red-50/40 text-red-900 font-medium'
+                      : 'border-slate-300 focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600'
+                  }`}
                 />
                 <button
+                  type="button"
                   onClick={() => handleSendQuery()}
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-3 rounded-xl text-xs transition flex items-center gap-1.5 shadow-sm shadow-emerald-600/30"
+                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-3 rounded-xl text-xs transition flex items-center gap-1.5 shadow-sm shadow-emerald-600/30 shrink-0"
                 >
                   <span>{t.hero.sendBtn}</span>
                   <span>→</span>
