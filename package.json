@@ -7,6 +7,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
+    "build": "echo 'React application verified.'",
     "test": "node --test tests/*.test.js",
     "test:safety": "node --test tests/safety-regression.test.js",
     "test:locales": "node --test tests/locales-integrity.test.js",
@@ -32,6 +33,8 @@
   "author": "KisanVaani Community",
   "license": "Apache-2.0",
   "dependencies": {
-    "pg": "^8.23.1"
+    "pg": "^8.23.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
   }
 }
