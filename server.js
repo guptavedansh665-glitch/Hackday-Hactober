@@ -26,6 +26,14 @@ const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = path.join(__dirname, 'apps/web');
 const LOCALES_DIR = path.join(__dirname, 'locales');
 const DATASET_PATH = path.join(__dirname, 'datasets/sample_labels/pesticide_registry.json');
+const SCHEMES_DATASET_PATH = path.join(__dirname, 'datasets/schemes_registry.json');
+
+let schemesRegistry = [];
+try {
+  schemesRegistry = JSON.parse(fs.readFileSync(SCHEMES_DATASET_PATH, 'utf-8'));
+} catch (e) {
+  console.warn('[KissanAI] Could not load schemes_registry.json:', e.message);
+}
 
 // Core Engines
 const validator = new SafetyValidator(path.join(LOCALES_DIR, 'en.json'));
@@ -526,7 +534,66 @@ const server = http.createServer(async (req, res) => {
   }
 
   // ==========================================
-  // 9. WHATSAPP MANDI & CROP ADVISORY ALERTS
+  // 9. CENTRAL & STATE GOVERNMENT SCHEMES REGISTRY
+  // ==========================================
+  if (req.method === 'GET' && (pathname === '/api/schemes' || pathname.startsWith('/api/schemes/'))) {
+    const parts = pathname.split('/').filter(Boolean);
+    if (parts.length === 3) {
+      const schemeId = parts[2];
+      const found = schemesRegistry.find(s => s.id === schemeId);
+      if (found) {
+        return sendJson(res, 200, { success: true, scheme: found });
+      } else {
+        return sendJson(res, 404, { success: false, error: 'Scheme not found' });
+      }
+    }
+
+    const stateFilter = url.searchParams.get('state');
+    const categoryFilter = url.searchParams.get('category');
+    const searchQuery = url.searchParams.get('q');
+
+    let filtered = [...schemesRegistry];
+    if (stateFilter && stateFilter !== 'all') {
+      const stateAliases = {
+        'wb': 'west bengal',
+        'mh': 'maharashtra',
+        'mp': 'madhya pradesh',
+        'up': 'uttar pradesh',
+        'pb': 'punjab'
+      };
+      const targetState = stateAliases[stateFilter.toLowerCase()] || stateFilter.toLowerCase();
+      filtered = filtered.filter(s => {
+        if (stateFilter === 'central') return s.level === 'Central';
+        return s.state.toLowerCase().includes(targetState) || s.state === 'All India';
+      });
+    }
+    if (categoryFilter && categoryFilter !== 'all') {
+      filtered = filtered.filter(s => s.category === categoryFilter);
+    }
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter(s => {
+        return (
+          (s.name.en && s.name.en.toLowerCase().includes(q)) ||
+          (s.name.hi && s.name.hi.toLowerCase().includes(q)) ||
+          (s.name.bn && s.name.bn.toLowerCase().includes(q)) ||
+          (s.name.mr && s.name.mr.toLowerCase().includes(q)) ||
+          (s.ministry && s.ministry.toLowerCase().includes(q)) ||
+          (s.portalName && s.portalName.toLowerCase().includes(q))
+        );
+      });
+    }
+
+    return sendJson(res, 200, {
+      success: true,
+      totalCount: schemesRegistry.length,
+      filteredCount: filtered.length,
+      schemes: filtered
+    });
+  }
+
+  // ==========================================
+  // 10. WHATSAPP MANDI & CROP ADVISORY ALERTS
   // ==========================================
   if (req.method === 'POST' && pathname === '/api/alerts/whatsapp/subscribe') {
     const { farmerId, phone, crop, market, frequency, alertType, language } = await parseBody(req);
@@ -812,6 +879,7 @@ if (require.main === module) {
       console.log(`   - GET  /api/reviews           (Translation review pipeline)`);
       console.log(`   - POST /api/validate-safety   (Safety regression validator)`);
       console.log(`   - GET  /api/pesticides        (Public CIBRC label registry)`);
+      console.log(`   - GET  /api/schemes           (Central & State Govt schemes)`);
       console.log(`   - GET  /api/mandi-rates       (Postgres live APMC rates)`);
       console.log(`   - POST /api/advisory          (Dhenu AI Voice assistant)`);
       console.log(`   - POST /api/dosage-calculator (Anti-overdose calculator)`);
