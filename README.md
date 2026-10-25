@@ -3,11 +3,26 @@
 > **Community-Driven Agricultural Safety Platform**  
 > Democratizing verified pesticide safety instructions, statutory CIBRC guidelines, and regional language translations for farmers across India through open-source collaboration and automated safety regression testing.
 
+> 📽️ **Project Presentation & Pitch Deck (PPT):** [**Click here to view the official Canva PPT Slide Deck**](https://canva.link/jxuf910jpdwx9yi)
+
 [![CI Status](https://img.shields.io/badge/CI-Passing-emerald?style=for-the-badge&logo=github-actions)](.github/workflows/safety-and-translation-ci.yml)
+[![Presentation PPT](https://img.shields.io/badge/Presentation%20(PPT)-Canva%20Pitch%20Deck-7D2AE8?style=for-the-badge&logo=canva)](https://canva.link/jxuf910jpdwx9yi)
 [![Good First Issues](https://img.shields.io/badge/Good%20First%20Issues-Available-blue?style=for-the-badge&logo=github)](.github/generated_issues/)
 [![Safety Testing](https://img.shields.io/badge/Safety%20Regression-Automated%20Gate-red?style=for-the-badge&logo=shield)](packages/safety-validation/safety-validator.js)
 [![Stack](https://img.shields.io/badge/Stack-React%20%2B%20Node.js-61DAFB?style=for-the-badge&logo=react)](package.json)
 [![License](https://img.shields.io/badge/License-Apache--2.0-yellow?style=for-the-badge)](LICENSE)
+
+---
+
+## 📽️ Project Presentation & Pitch Deck (PPT)
+
+- 🔗 **Canva Presentation Link (PPT):** [**https://canva.link/jxuf910jpdwx9yi**](https://canva.link/jxuf910jpdwx9yi)
+- **Highlights Covered:**
+  - AI Multimodal Disease Diagnosis with live camera reticle & scanner HUD
+  - Mathematical safety regression gates preventing fatal translation errors in agriculture
+  - Central & State Government farmer schemes directory with 1-minute eligibility calculator
+  - Multilingual voice synthesis (TTS) & Web Speech API recognition for Indian languages
+  - Offline Field Mode for emergency pesticide ingestion first-aid with zero internet
 
 ---
 
